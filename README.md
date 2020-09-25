@@ -11,11 +11,44 @@ The following describes how to configure Fluentd and Splunk to gather logs from 
 | 0.2.0   | 7.7.3       | 3.8.0 | N/A          | N/A             | N/A       | 8.0.5 Build: a1a6394cc5ae |
 | 0.1.1   | 7.6.3       | 3.6.2 | N/A          | N/A             | N/A       | 8.0.5 Build: a1a6394cc5ae |
 
-## Splunk Config
+## General Config
 
 Fluentd setup must be completed prior to Splunk. Please refer back to the main README for detailed instructions on general Fluentd setup.
 
 You will need to install the log collector for each product Artifactory, Xray, Distribution, Mission Control, and Pipelines.
+
+The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location.
+
+Helm based installs will already have this defined based upon the underlying docker images.
+
+For non-k8s based installations below is a reference to the Docker image locations per product. Note these locations may be different based upon the installation location chosen.
+
+````text
+Artifactory: 
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/artifactory/
+````
+
+````text
+Xray:
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/xray/
+````
+
+````text
+Mision Control:
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/mc/
+````
+
+````text
+Distribution:
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/distribution/
+````
+
+````text
+Pipelines:
+export JF_PRODUCT_DATA_INTERNAL=/opt/jfrog/pipelines/var/
+````
+
+## Splunk Config
 
 To use the integration an administrator of Splunk will need to install the JFrog Logs Application into Splunk from Splunkbase.
 
@@ -41,6 +74,7 @@ Users will also need to specify the HEC_HOST, HEC_PORT and if ssl is enabled the
   ca_file /path/to/ca.pem
 </match>
 ```
+
 
 ## Splunk Demo
 
