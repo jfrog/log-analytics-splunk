@@ -1,11 +1,11 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
-## [1.1.1] - Sept 25, 2020
-* Splunk fluentd configs updated to use JF_PRODUCT_DATA_INTERNAL env.
+## [1.0.0] - Sept 25, 2020
+* [BREAKING] Splunk fluentd configs updated to use JF_PRODUCT_DATA_INTERNAL env.
 
-## [1.1.0] - Sept 9, 2020
-* Splunk repo now submodule of parent log-analytics and bumped to Splunkbase app version number.
+## [0.5.1] - Sept 9, 2020
+* Splunk repo now submodule of parent log-analytics.
 
 ## [0.5.0] - Sept 8, 2020
 * Adding JFrog Pipelines fluent configuration files to capture logs
