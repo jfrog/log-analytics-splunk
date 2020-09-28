@@ -20,7 +20,7 @@
 </source>
 <source>
   @type tail
-  @id api_production_out
+  @id www_production_out
   path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/www_production_out.log"
   pos_file "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/www_production_out.log.pos"
   tag jfrog.pipelines.www.production
