@@ -106,38 +106,16 @@
 # SPLUNK OUTPUT
 ####################
 <match jfrog.**>
-  @type copy
-  <store>
-      @type splunk_hec
-      host HEC_HOST
-      port HEC_PORT
-      token HEC_TOKEN
-      format json
-      sourcetype_key log_source
-      use_fluentd_time false
-      # buffered output parameter
-      flush_interval 10s
-      # ssl parameter
-      #use_ssl true
-      #ca_file /path/to/ca.pem
-  </store>
-  #<store>
-  #  Example log rotation through fluentd
-  #  @type file
-  #  path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/archived"
-  #  compress gzip
-  #  <format>
-  #    localtime false
-  #  </format>
-  #  <buffer time>
-  #    timekey_wait 10m
-  #    timekey 86400
-  #    timekey_use_utc true
-  #    path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/archived"
-  #  </buffer>
-  #  <inject>
-  #    time_format %Y%m%dT%H%M%S%z
-  #    localtime false
-  #  </inject>
-  #</store>
+  @type splunk_hec
+  host HEC_HOST
+  port HEC_PORT
+  token HEC_TOKEN
+  format json
+  sourcetype_key log_source
+  use_fluentd_time false
+  # buffered output parameter
+  flush_interval 10s
+  # ssl parameter
+  #use_ssl true
+  #ca_file /path/to/ca.pem
 </match>
