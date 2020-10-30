@@ -93,7 +93,8 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 3. Click on "HTTP Event Collector"
 4. Click on "Global Settings"
 5. If Disabled, Click on All Tokens "Enabled"
-6. Click "Save"
+6. (Optional) HTTPS check SSL enabled or HTTP uncheck SSL enabled flag
+7. Click "Save"
 ````
 
 #### Configure new HEC token
