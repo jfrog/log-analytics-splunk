@@ -195,12 +195,6 @@ Once they have a Splunk up for demo purposes they will need to configure the HEC
 
 They can now access Splunk to view the JFrog dashboard as new data comes in.
 
-## Generating Data for Testing
-
-To quickly generate data you can use the demo configuration fluentd files checked into the fluentd folder of this repo.
-
-Point these are your Splunk instance to quickly load data into all the widgets of the dashboard.
-
 ## References
 
 * [Fluentd](https://www.fluentd.org) - Fluentd Logging Aggregator/Agent
