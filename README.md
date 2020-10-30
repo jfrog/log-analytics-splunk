@@ -67,7 +67,18 @@ Install the `JFrog Log Analytics Platform` app from Splunkbase [here!](https://s
 7. Click upload
 ````
 
-Confirm the version has changed to the new version or if first install that the application now appears.
+
+Restart Splunk post installation of App.
+
+````text 
+1. Open Splunk web console as adminstrator
+2. Click on Settings then Server Controls
+3. Click on Restart 
+````
+
+Login to Splunk after the restart completes.
+
+Confirm the version is the latest version available in Splunkbase.
 
 ### Configure Splunk HEC
 
