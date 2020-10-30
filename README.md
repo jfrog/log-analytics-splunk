@@ -156,7 +156,7 @@ These values override the last section of the `fluentd.conf` shown below:
 </match>
 ```
 
-If ssl is enabled the ca_file to be used and must be supplied.
+If ssl is enabled the ca_file will be used and must be supplied.
 
 
 ## Dockerhub Pull Requests
