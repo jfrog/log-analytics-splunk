@@ -1,3 +1,6 @@
+## [1.1.2] - Nov 3rd, 2020
+* Dockerhub Rate Impacts Javascript Bug Fix
+
 ## [1.1.1] - Oct 29, 2020
 * Dockerhub Rate Impacts Log Analytic Solution
 

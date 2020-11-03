@@ -1,4 +1,4 @@
-require(['jquery','underscore','splunkjs/mvc','splunkjs/mvc/tableview','splunkjs/highcharts','bootstrap.tab','splunkjs/mvc/simplexml/ready!'],
+require(['jquery','underscore','splunkjs/mvc', 'bootstrap.tab', 'splunkjs/mvc/simplexml/ready!'],
 	function($, _, mvc){
 
 		var tabsInitialzed = [];
