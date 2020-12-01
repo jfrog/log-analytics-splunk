@@ -97,6 +97,29 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 7. Click "Save"
 ````
 
+#### Create new index
+````text
+1. Open Splunk web console as adminstrator
+2. Click on "Settings" in dropdown select "Indexes"
+3. Click on "New Index"
+4. Enter Index name as jfrog_splunk
+5. Click "Save"
+````
+
+#### Create macro to avoid index dependency
+````text
+1. Open Splunk web console as adminstrator
+2. Click on "Settings" in dropdown select "Advanced Search"
+3. Click on "Add New" next to Search macros
+4. Under destination app, select "jfrog-logs"
+5. Enter name of the macro as "default_index"
+6. Under definition, enter "index=jfrog_splunk"
+7. Click "Save" to save your macro
+8. Click on "Permissions" next to your macro
+9. Select Object should appear in "This app only"
+10. Click "Save"
+````
+
 #### Configure new HEC token
 ````text
 1. Open Splunk web console as adminstrator
@@ -107,7 +130,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 6. (Optional) Enter a "Description" in the textbox
 7. Click on the green "Next" button
 8. Select App Context of "JFrog Platform Log Analytics" in the dropdown
-9. Add the index to store the JFrog platform log data into.
+9. Add "jfrog_splunk" index to store the JFrog platform log data into.
 10. CLick on the green "Review" button
 11. If good, Click on the green "Done" button
 12. Save the generated token value
@@ -159,6 +182,7 @@ These values override the last section of the `fluentd.conf` shown below:
   host HEC_HOST
   port HEC_PORT
   token HEC_TOKEN
+  index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
