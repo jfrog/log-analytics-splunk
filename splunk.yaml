@@ -1,3 +1,34 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: splunk-master-data
+  labels:
+    app: splunk
+    role: splunk_cluster_master
+    tier: management
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: splunk-master-config
+  labels:
+    app: splunk
+    role: splunk_cluster_master
+    tier: management
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,6 +59,20 @@ spec:
             -  containerPort: 8000
             -  containerPort: 8088
             -  containerPort: 8089   
+            -  containerPort: 9996
+            -  containerPort: 9997
+          volumeMounts:
+            - name: splunk-master-data
+              mountPath: /opt/splunk/var
+            - name: splunk-master-config
+              mountPath: /opt/splunk/etc
+      volumes:
+        - name: splunk-master-config
+          persistentVolumeClaim:
+            claimName: splunk-master-config
+        - name: splunk-master-data
+          persistentVolumeClaim:
+            claimName: splunk-master-data
 ---
 kind: Service
 apiVersion: v1
@@ -51,6 +96,14 @@ spec:
     protocol: TCP
     port: 8089
     targetPort: 8089
+  - name: tcpinput
+    protocol: TCP
+    port: 9996
+    targetPort: 9996
+  - name: forwarder
+    protocol: TCP
+    port: 9997
+    targetPort: 9997
   type: ClusterIP
 ---
 kind: Service
@@ -67,10 +120,6 @@ spec:
     protocol: TCP
     port: 80
     targetPort: 8000
-  - name: hec
-    protocol: TCP
-    port: 8088
-    targetPort: 8088
   - name: api
     protocol: TCP
     port: 8089
