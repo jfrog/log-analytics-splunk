@@ -35,7 +35,7 @@
       <chart>
         <title>Log Volume</title>
         <search>
-          <query>`default_index` $application_control$ log_source!="NULL" log_source="jfrog.rt.*" | timechart count by log_source</query>
+          <query>`default_index` $application_control$ log_source!="NULL" log_source!="jfrog.xray.*" | timechart count by log_source</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
