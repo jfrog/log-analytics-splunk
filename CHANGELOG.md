@@ -1,6 +1,10 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
+## [0.9.0] - Dec 1, 2020
+* Log Volume charts to show only artifactory and xray logs respectively
+* Adding macro to avoid index dependency
+
 ## [0.8.0] - Oct 20, 2020
 * README updates for new Dockerhub / Docker widgets in Splunkbase app
 * Added CHANGELOG-splunkbase.md to mirror release notes in Splunkbase
