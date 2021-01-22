@@ -73,4 +73,50 @@
       </chart>
     </panel>
   </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Vulnerability count based on severity</title>
+        <search>
+          <query>index="xray_violations" severity!="unknown"  | timechart  count by severity</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.drilldown">none</option>
+        <option name="height">243</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Top 10 CVE's based on violation count and severity</title>
+        <search>
+          <query>index="xray_violations" cve!=null | stats count by cve, severity | sort - count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Recent vulnerabilities information</title>
+        <search>
+          <query>index="xray_violations" | sort -created | fields "created", "severity", "cve", "impacted_artifacts{}", "signature", "summary", "url", "category" | fields - _raw | fields - _time | rename signature as watch_name</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="count">5</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
 </form>
