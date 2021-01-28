@@ -252,7 +252,7 @@ Run the fluentd wrapper with one argument pointed to the configuration file to l
 ./fluentd test.conf
 ````
 
-Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Elastic.
+Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Splunk.
 
 ### Kubernetes
 
@@ -264,7 +264,7 @@ Recommended install for Kubernetes is to utilize the helm chart with the associa
 | Artifactory HA | helm/artifactory-ha-values.yaml |
 | Xray | helm/xray-values.yaml |
 
-Update the values.yaml associated to the product you want to deploy with your Elastic settings.
+Update the values.yaml associated to the product you want to deploy with your Splunk settings.
 
 Then deploy the helm chart such as below:
 
@@ -322,7 +322,7 @@ Run the fluentd wrapper with one argument pointed to the configuration file to l
 ./fluentd test.conf
 ````
 
-Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Elastic.
+Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Splunk.
 
 
 ## Dockerhub Pull Requests
