@@ -1,6 +1,9 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
+## [0.9.1] - Jan 28, 2021
+* Helm support for Splunk to deploy Artifactory or Xray via helm with logs sent to Splunk
+
 ## [0.9.0] - Dec 1, 2020
 * Log Volume charts to show only artifactory and xray logs respectively
 * Adding macro to avoid index dependency
