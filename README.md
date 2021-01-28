@@ -351,7 +351,7 @@ An alert is also available to enable if desired that will allow you to send emai
 To run this integration for Splunk users can create a Splunk instance with the correct ports open in Kubernetes by applying the yaml file:
 
 ``` 
-kubectl apply -f splunk.yaml
+kubectl apply -f k8s/splunk.yaml
 ```
 
 This will create a new Splunk instance you can use for a demo to send your JFrog logs over to.
