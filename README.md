@@ -3,6 +3,8 @@
 ## Version Matrix
 | version | artifactory | xray   | distribution | mission_control | pipelines | splunk                    |
 |---------|-------------|--------|--------------|-----------------|-----------|---------------------------|
+| 0.9.1   | 7.12.6      | 3.15.3 | 2.6.0        | 4.6.2           | 1.10.0    | 8.0.5 Build: a1a6394cc5ae |
+| 0.9.0   | 7.11.5      | 3.15.1 | 2.6.0        | 4.6.2           | 1.10.0    | 8.0.5 Build: a1a6394cc5ae |
 | 0.8.0   | 7.10.2      | 3.10.3 | 2.4.2        | 4.5.0           | 1.8.0     | 8.0.5 Build: a1a6394cc5ae |
 | 0.7.0   | 7.9.1       | 3.9.1  | 2.4.2        | 4.5.0           | 1.8.0     | 8.0.5 Build: a1a6394cc5ae |
 | 0.6.0   | 7.7.8       | 3.8.6  | 2.4.2        | 4.5.0           | 1.7.2     | 8.0.5 Build: a1a6394cc5ae |
@@ -11,43 +13,6 @@
 | 0.3.0   | 7.7.3       | 3.8.0  | 2.4.2        | N/A             | N/A       | 8.0.5 Build: a1a6394cc5ae |
 | 0.2.0   | 7.7.3       | 3.8.0  | N/A          | N/A             | N/A       | 8.0.5 Build: a1a6394cc5ae |
 | 0.1.1   | 7.6.3       | 3.6.2  | N/A          | N/A             | N/A       | 8.0.5 Build: a1a6394cc5ae |
-
-## Required Environment Variable
-
-`JF_PRODUCT_DATA_INTERNAL` is required check if already set if not see example values below:
-
-Artifactory: 
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/artifactory/
-````
-
-Xray:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/xray/
-````
-
-Mision Control:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/mc/
-````
-
-Distribution:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/distribution/
-````
-
-Pipelines:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/opt/jfrog/pipelines/var/
-````
-
-## Log Collector Requirement
-
-Fluentd is the supported log collector for this integration.
-
-Fluentd setup must be completed prior to Splunk.
-
-For Fluentd setup information read the JFrog log analytic repository's [README.](https://github.com/jfrog/log-analytics/blob/master/README.md)
 
 ## Splunk Configuration
 
@@ -193,6 +158,182 @@ These values override the last section of the `fluentd.conf` shown below:
 ```
 
 If ssl is enabled the ca_file will be used and must be supplied.
+
+
+## Required Environment Variable
+
+`JF_PRODUCT_DATA_INTERNAL` is required check if already set if not see example values below:
+
+Artifactory: 
+````text
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/artifactory/
+````
+
+Xray:
+````text
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/xray/
+````
+
+Mision Control:
+````text
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/mc/
+````
+
+Distribution:
+````text
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/distribution/
+````
+
+Pipelines:
+````text
+export JF_PRODUCT_DATA_INTERNAL=/opt/jfrog/pipelines/var/
+````
+
+
+## Fluentd Install
+
+### OS / Virtual Machine
+
+Recommended install is through fluentd's native OS based package installs:
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| CentOS/RHEL   | RPM (YUM)       | https://docs.fluentd.org/installation/install-by-rpm |
+| Debian/Ubuntu | APT             | https://docs.fluentd.org/installation/install-by-deb |
+| MacOS/Darwin  | DMG             | https://docs.fluentd.org/installation/install-by-dmg |
+| Windows       | MSI             | https://docs.fluentd.org/installation/install-by-msi |
+
+User installs can utilize the zip installer for Linux
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+
+Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above:
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+````
+
+Untar to create the folder:
+````text
+tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
+````
+Move into the new folder:
+
+````text
+cd fluentd-1.11.0-linux-x86_64
+````
+Run the fluentd wrapper with one argument pointed to the configuration file to load:
+
+````text
+./fluentd test.conf
+````
+
+Next steps are to setup a  `fluentd.conf` file using the relevant integrations for Splunk, DataDog, Elastic, or Prometheus.
+
+### Docker
+
+Recommended install for Docker is to utilize the zip installer for Linux
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+
+Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above:
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+````
+
+Untar to create the folder:
+````text
+tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
+````
+Move into the new folder:
+
+````text
+cd fluentd-1.11.0-linux-x86_64
+````
+Run the fluentd wrapper with one argument pointed to the configuration file to load:
+
+````text
+./fluentd test.conf
+````
+
+Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Elastic.
+
+### Kubernetes
+
+Recommended install for Kubernetes is to utilize the helm chart with the associated values.yaml in this repo.
+
+| Product | Example Values File |
+|---------|-------------|
+| Artifactory | helm/artifactory-values.yaml |
+| Artifactory HA | helm/artifactory-ha-values.yaml |
+| Xray | helm/xray-values.yaml |
+
+Update the values.yaml associated to the product you want to deploy with your Elastic settings.
+
+Then deploy the helm chart such as below:
+
+Artifactory ⎈:
+```text
+helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
+       --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+       --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+       -f helm/artifactory-values.yaml
+```
+
+Artifactory-HA ⎈:
+```text
+helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
+       --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+       --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+       -f helm/artifactory-ha-values.yaml
+```
+
+Xray ⎈:
+```text
+helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=http://my-artifactory-nginx-url \
+       --set xray.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+       --set xray.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+       -f helm/xray-values.yaml
+```
+
+#### Kubernetes Deployment without Helm
+
+To modify existing Kubernetes based deployments without using Helm users can use the zip installer for Linux:
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+
+Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above:
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+````
+
+Untar to create the folder:
+````text
+tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
+````
+Move into the new folder:
+
+````text
+cd fluentd-1.11.0-linux-x86_64
+````
+Run the fluentd wrapper with one argument pointed to the configuration file to load:
+
+````text
+./fluentd test.conf
+````
+
+Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Elastic.
 
 
 ## Dockerhub Pull Requests
