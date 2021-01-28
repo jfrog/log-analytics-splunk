@@ -46,5 +46,5 @@ artifactory:
 splunk:
   host: splunk.example.com
   port: 8088
-  token: my_splunk_token
+  token: splunk_hec_token
   index: jfrog_splunk

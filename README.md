@@ -45,22 +45,11 @@ Login to Splunk after the restart completes.
 
 Confirm the version is the latest version available in Splunkbase.
 
-### Configure Splunk HEC
+### Configure Splunk
 
 Our integration uses the [Splunk HEC](https://dev.splunk.com/enterprise/docs/dataapps/httpeventcollector/) to send data to Splunk.
 
 Users will need to configure the HEC to accept data (enabled) and also create a new token. Steps are below.
-
-#### Configure HEC to accept data
-````text
-1. Open Splunk web console as adminstrator
-2. Click on "Settings" in dropdown select "Data inputs"
-3. Click on "HTTP Event Collector"
-4. Click on "Global Settings"
-5. If Disabled, Click on All Tokens "Enabled"
-6. (Optional) HTTPS check SSL enabled or HTTP uncheck SSL enabled flag
-7. Click "Save"
-````
 
 #### Create new index
 ````text
