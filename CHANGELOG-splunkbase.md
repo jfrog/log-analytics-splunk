@@ -1,3 +1,6 @@
+## [1.1.3] - Feb 2nd, 2021
+* Added Xray Vulnerability Widgets
+
 ## [1.1.2] - Nov 3rd, 2020
 * Dockerhub Rate Impacts Javascript Bug Fix
 
