@@ -51,13 +51,37 @@ Our integration uses the [Splunk HEC](https://dev.splunk.com/enterprise/docs/dat
 
 Users will need to configure the HEC to accept data (enabled) and also create a new token. Steps are below.
 
-#### Create new index
+#### Create index jfrog_splunk
 ````text
 1. Open Splunk web console as adminstrator
 2. Click on "Settings" in dropdown select "Indexes"
 3. Click on "New Index"
 4. Enter Index name as jfrog_splunk
 5. Click "Save"
+````
+
+#### Create index xray_violations
+````text 
+1. Open Splunk web console as adminstrator
+2. Click on "Settings" in dropdown select "Indexes"
+3. Click on "New Index"
+4. Enter Index name as xray_violations
+5. Click "Save"
+````   
+
+#### Create Eventtype
+````text
+1. Open Splunk web console as administrator
+2. Click on "Settings" in dropdown select "Event types"
+3. Click on "New Event Type"
+4. Select destination app as "Search"
+5. Enter event type name
+6. Enter index="xray_violations" as search string
+7. Enter "report, vulnerability" as tags
+8. Click "Save" to save your eventtype
+9. Click on "Permissions" next to your eventtype
+10. Select Object should appear in "This app only"
+11. Click "Save"
 ````
 
 #### Create macro to avoid index dependency
@@ -74,7 +98,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 10. Click "Save"
 ````
 
-#### Configure new HEC token
+#### Configure new HEC token to receive Logs
 ````text
 1. Open Splunk web console as adminstrator
 2. Click on "Settings" in dropdown select "Data inputs"
@@ -85,7 +109,23 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 7. Click on the green "Next" button
 8. Select App Context of "JFrog Platform Log Analytics" in the dropdown
 9. Add "jfrog_splunk" index to store the JFrog platform log data into.
-10. CLick on the green "Review" button
+10. Click on the green "Review" button
+11. If good, Click on the green "Done" button
+12. Save the generated token value
+````
+
+#### Configure new HEC token to receive Xray Violations
+````text 
+1. Open Splunk web cobsole as administrator
+2. Click on "Settings" in dropdown select "Data inputs"
+3. Click on "HTTP Event Collector"
+4. Click on "New Token"
+5. Enter a "Name" in the textbox
+6. (Optional) Enter a "Description" in the textbox
+7. Click on the green "Next" button
+8. Select sourcetype by Clicking on Select > Select Source Type dropdown > Structured > _json
+9. Add "xray_violations" index to store the JFrog platform log data into.
+10. Click on the green "Review" button
 11. If good, Click on the green "Done" button
 12. Save the generated token value
 ````
@@ -101,6 +141,7 @@ wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.
 Xray:
 ````text
 wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray
+wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/splunk/splunk_siem.conf
 ````
 
 Mision Control:
@@ -118,10 +159,9 @@ Pipelines:
 wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.pipelines
 ````
 
+#### Configure fluentd configuration files
 
-#### Configure fluentd.conf
-
-Users need to specify the following parameters:
+Users need to specify the following match directive parameters in fluent.conf and splunk_siem.conf files
 
 ````text
 HEC_HOST   -> IP address or DNS of Splunk HEC 
@@ -129,7 +169,7 @@ HEC_PORT   -> Splunk HEC port default is 8088
 HEC_TOKEN  -> Saved generated token above
 ````
 
-These values override the last section of the `fluentd.conf` shown below:
+These values override the last section of the `fluentd.conf` and `splunk_siem.conf` shown below:
 ``` 
 <match jfrog.**>
   @type splunk_hec
@@ -148,6 +188,22 @@ These values override the last section of the `fluentd.conf` shown below:
 
 If ssl is enabled the ca_file will be used and must be supplied.
 
+index in match directive is `jfrog_splunk` for fluent configurations and `xray_violations` for siem configuration
+
+#### Configure splunk_siem.conf
+
+Integration is done by setting up Xray. Obtain JPD url and access token for API. Configure the source directive parameters specified below
+
+* **tag** (string) (required): The value is the tag assigned to the generated events.
+* **jpd_url** (string) (required): JPD url required to pull Xray SIEM violations
+* **access_token** (string) (required): [Access token](https://www.jfrog.com/confluence/display/JFROG/Access+Tokens) to authenticate Xray
+* **pos_file** (string) (required): Position file to record last SIEM violation pulled
+* **batch_size** (integer) (optional): Batch size for processing violations
+    * Default value: `25`
+* **thread_count** (integer) (optional): Number of workers to process violation records in thread pool
+    * Default value: `5`
+* **wait_interval** (integer) (optional): Wait interval between pulling new events
+    * Default value: `60`
 
 ## Required Environment Variable
 
@@ -334,6 +390,17 @@ Free accounts allow up to 200 pull requests per 6 hour window.
 Various widgets have been added in the new Docker tab under Artifactory to help monitor your Dockerhub pull requests.
 
 An alert is also available to enable if desired that will allow you to send emails or add outbound webhooks through configuration to be notified when you exceed the configurable threshold.
+
+## Xray Violations
+
+With Xray integration, new widgets have been added to provide insights into the type, frequency and volume of violations that are reported as a result of Xray scanning.  
+
+The vulnerability count widget provides a historical summary of all the high, medium and low level vulnerabilities reported over a selectable time period.  For example, customers can quickly view the number of critical (high level) vulnerabilities that have been reported by Xray over the time.  
+
+The top 10 CVE table provides information about the most frequently occurring vulnerabilities over a period of time. 
+
+The vulnerability table provides additional information on each of the violations including the time of occurence, type of violation, impacted artifacts and other details that allow customers to trace the impact of the violation. 
+
 
 ## Splunk Demo
 
