@@ -69,7 +69,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Click "Save"
 ````   
 
-#### Create Eventtype
+#### Create Eventtype for Vulnerability CIM compatibility
 ````text
 1. Open Splunk web console as administrator
 2. Click on "Settings" in dropdown select "Event types"
@@ -78,6 +78,36 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Enter event type name
 6. Enter index="xray_violations" as search string
 7. Enter "report, vulnerability" as tags
+8. Click "Save" to save your eventtype
+9. Click on "Permissions" next to your eventtype
+10. Select Object should appear in "This app only"
+11. Click "Save"
+````
+
+#### Create Eventtype for Web CIM compatibility
+````text
+1. Open Splunk web console as administrator
+2. Click on "Settings" in dropdown select "Event types"
+3. Click on "New Event Type"
+4. Select destination app as "Search"
+5. Enter event type name
+6. Enter index="jfrog_splunk" as search string
+7. Enter "web" as tag
+8. Click "Save" to save your eventtype
+9. Click on "Permissions" next to your eventtype
+10. Select Object should appear in "This app only"
+11. Click "Save"
+````
+
+#### Create Eventtype for Change CIM compatibility
+````text
+1. Open Splunk web console as administrator
+2. Click on "Settings" in dropdown select "Event types"
+3. Click on "New Event Type"
+4. Select destination app as "Search"
+5. Enter event type name
+6. Enter index="jfrog_splunk" as search string
+7. Enter "change" as tags
 8. Click "Save" to save your eventtype
 9. Click on "Permissions" next to your eventtype
 10. Select Object should appear in "This app only"
@@ -401,6 +431,8 @@ The top 10 CVE table provides information about the most frequently occurring vu
 
 The vulnerability table provides additional information on each of the violations including the time of occurence, type of violation, impacted artifacts and other details that allow customers to trace the impact of the violation. 
 
+
+## Request and access log compatibility to Splunk web, Change CIM
 
 ## Splunk Demo
 
