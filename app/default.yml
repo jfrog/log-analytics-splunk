@@ -4,8 +4,6 @@ splunk:
   home: /opt/splunk
   user: splunk
   group: splunk
-  exec: /opt/splunk/bin/splunk
-  pid: /opt/splunk/var/run/splunk/splunkd.pid
   password: "password1"
   svc_port: 8089
   s2s_port: 9997
