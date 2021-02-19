@@ -1,4 +1,4 @@
-## [1.1.4] - Feb 18th, 2021
+## [1.1.4] - Feb 19th, 2021
 * Normalizing access and request logs to Splunk Web and Change CIM
 * Added eventtypes, tags, fields, macros to the app
 
