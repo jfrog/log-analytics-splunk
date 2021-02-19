@@ -1,6 +1,10 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
+## [0.10.0] - Feb 17, 2021
+* Normalizing access, request logs
+* Added eventtypes, tags, fields, macros to the app
+
 ## [0.9.2] - Feb 3, 2021
 * New Widgets to Xray tab to show vulnerability information
 

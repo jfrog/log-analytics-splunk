@@ -1,3 +1,7 @@
+## [1.1.4] - Feb 18th, 2021
+* Normalizing access and request logs to Splunk Web and Change CIM
+* Added eventtypes, tags, fields, macros to the app
+
 ## [1.1.3] - Feb 2nd, 2021
 * Added Xray Vulnerability Widgets
 

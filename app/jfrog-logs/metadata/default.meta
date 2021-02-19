@@ -18,3 +18,113 @@ modtime = 1588708421.478459000
 [app/install/install_source_checksum]
 version = 8.0.3
 modtime = 1588970236.816055000
+
+[eventtypes/access_audit_eventtype]
+export = system
+version = 8.1.2
+
+[tags/eventtype%3Daccess_audit_eventtype]
+export = system
+version = 8.1.2
+modtime = 1613598849.148678000
+
+[eventtypes/artifactory_request_eventtype]
+export = system
+version = 8.1.2
+modtime = 1613598854.140799000
+
+[tags/eventtype%3Dartifactory_request_eventtype]
+export = system
+version = 8.1.2
+modtime = 1613598854.143679000
+
+[eventtypes/router_request_eventtype]
+export = system
+version = 8.1.2
+modtime = 1613598861.092277000
+
+[tags/eventtype%3Drouter_request_eventtype]
+export = system
+version = 8.1.2
+modtime = 1613598861.094997000
+
+[props/jfrog.rt.access.audit/FIELDALIAS-change_cim_to_access_audit_logs]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599097.780904000
+
+[props/jfrog.rt.artifactory.request/FIELDALIAS-web_cim_to_artifactory_request_logs]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599104.926349000
+
+[props/jfrog.rt.router.request/FIELDALIAS-web_cim_to_router_request_logs]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599110.071746000
+
+[props/jfrog.rt.access.audit/EVAL-action]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599307.893122000
+
+[props/jfrog.rt.access.audit/EVAL-change_type]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599314.202966000
+
+[props/jfrog.rt.access.audit/EVAL-command]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599320.421809000
+
+[props/jfrog.rt.access.audit/EVAL-dvc]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599325.826373000
+
+[props/jfrog.rt.access.audit/EVAL-object_category]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599331.126107000
+
+[props/jfrog.rt.access.audit/EVAL-status]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599336.505381000
+
+[props/jfrog.rt.artifactory.request/EVAL-action]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599342.916029000
+
+[props/jfrog.rt.router.request/EVAL-action]
+access = read : [ * ], write : [ * ]
+export = system
+version = 8.1.2
+modtime = 1613599349.267343000
+
+[eventtypes/vulnerability_eventtype]
+export = system
+version = 8.1.2
+modtime = 1613599932.281743000
+
+[tags/eventtype%3Dvulnerability_eventtype]
+export = system
+version = 8.1.2
+modtime = 1613599932.285464000
+
+[macros/default_index]
+export = none
+version = 8.1.2
+modtime = 1613600110.142305000
