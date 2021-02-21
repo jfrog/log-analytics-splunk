@@ -41,6 +41,10 @@ common:
           mv {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf;
           sed 's/jfrog_splunk/{{ .Values.splunk.index }}/' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
           mv {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf
+          sed 's/JFROG_URL/{{ .Values.splunk.siem.jfrogUrl }}/' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
+          mv {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf
+          sed 's/JFROG_ACCESS_TOKEN/{{ .Values.splunk.siem.jfrogAccessToken }}/' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
+          mv {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
           name: data-volume
@@ -61,3 +65,6 @@ splunk:
   port: 8088
   token: splunk_hec_token
   index: jfrog_splunk
+  siem:
+    jfrogUrl: jfrog_url
+    jfrogAccessToken: jfrog_access_token
