@@ -1,4 +1,4 @@
-<form stylesheet="jfrog-logs.css">
+<form script="jfrog-logs.js" stylesheet="jfrog-logs.css">
   <label>Xray</label>
   <description>Xray Log Analytics</description>
   <fieldset submitButton="true" autoRun="true">
@@ -10,12 +10,26 @@
       </default>
     </input>
   </fieldset>
-  <row>
+  <row id="tabs">
+    <panel>
+      <html>
+        <ul id="tabs" class="nav nav-tabs">
+          <li class="active">
+            <a href="#Logs" class="toggle-tab" data-toggle="tab" data-elements="logs1,logs2,logs3" data-token="logs_control">Logs</a>
+          </li>
+          <li>
+            <a href="#Violations" class="toggle-tab" data-toggle="tab" data-elements="vulnerability1,vulnerability2,vulnerability3,vulnerability4,vulnerability5,vulnerability6,vulnerability7,vulnerability8" data-token="vulnerability_control">Violations</a>
+          </li>
+        </ul>
+      </html>
+    </panel>
+  </row>
+  <row id="logs1">
     <panel>
       <chart>
         <title>Log Volume</title>
         <search>
-          <query>`default_index` log_source!="NULL" log_source="jfrog.xray.*" | timechart count by log_source</query>
+          <query>`default_index` $logs_control$ log_source!="NULL" log_source="jfrog.xray.*" | timechart count by log_source</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -27,12 +41,12 @@
       </chart>
     </panel>
   </row>
-  <row>
+  <row id="logs2">
     <panel>
       <chart>
         <title>Log Errors</title>
         <search>
-          <query>`default_index` (sourcetype="jfrog.xray.*.service" OR log_source="jfrog.xray.*.service") log_level="ERROR" | timechart count by log_level</query>
+          <query>`default_index` $logs_control$ (sourcetype="jfrog.xray.*.service" OR log_source="jfrog.xray.*.service") log_level="ERROR" | timechart count by log_level</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -43,12 +57,12 @@
       </chart>
     </panel>
   </row>
-  <row>
+  <row id="logs3">
     <panel>
       <chart>
         <title>HTTP 500 Errors</title>
         <search>
-          <query>`default_index` (sourcetype="jfrog.xray.xray.request" OR log_source="jfrog.xray.xray.request") return_status="5*" | timechart count by return_status</query>
+          <query>`default_index` $logs_control$ (sourcetype="jfrog.xray.xray.request" OR log_source="jfrog.xray.xray.request") return_status="5*" | timechart count by return_status</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -62,7 +76,7 @@
       <chart>
         <title>HTTP Response Codes</title>
         <search>
-          <query>`default_index` (sourcetype="jfrog.xray.xray.request" OR log_source="jfrog.xray.xray.request") | timechart count by return_status</query>
+          <query>`default_index` $logs_control$ (sourcetype="jfrog.xray.xray.request" OR log_source="jfrog.xray.xray.request") | timechart count by return_status</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -73,49 +87,298 @@
       </chart>
     </panel>
   </row>
-  <row>
+  <row id="vulnerability1">
     <panel>
-      <chart>
-        <title>Vulnerability count based on severity</title>
+      <single>
+        <title>Watches</title>
         <search>
-          <query>index="xray_violations" severity!="unknown"  | timechart  count by severity</query>
+          <query>index="xray_violations" $vulnerability_control$ | stats dc(signature) as watches</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">116</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Vulnerabilities</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ category="Security" | stats count as Vulnerabilities</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>License Issues</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ category="License" | stats count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Violations</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ | stats count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Infected Components</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ | stats dc(infected_components{})</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Impacted Artifacts</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ | stats dc(impacted_artifacts{})</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </single>
+    </panel>
+  </row>
+  <row id="vulnerability2">
+    <panel>
+      <chart>
+        <title>Violations per Watch</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ | stats count by signature</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Violations Severity</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ severity!=Unknown $vulnerability_control$ | stats count by severity</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="vulnerability3">
+    <panel>
+      <chart>
+        <title>Violations by Policy</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ | stats count by matched_policies{}.policy</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Violations by Rule</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ | stats count by matched_policies{}.rule</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">pie</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="vulnerability4">
+    <panel>
+      <chart>
+        <title>Violation Types over Time (Stats)</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ | timechart count by category</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Violations over Time(By Severity)</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ severity!="unknown"  | timechart  count by severity</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="charting.axisTitleX.visibility">collapsed</option>
-        <option name="charting.chart">area</option>
-        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.drilldown">all</option>
         <option name="height">243</option>
         <option name="refresh.display">progressbar</option>
       </chart>
     </panel>
   </row>
-  <row>
+  <row id="vulnerability5">
     <panel>
-      <table>
-        <title>Top 10 CVE's based on violation count and severity</title>
+      <chart>
+        <title>Top Infected Components</title>
         <search>
-          <query>index="xray_violations" cve!=null | stats count by cve, severity | sort - count</query>
+          <query>index="xray_violations" $vulnerability_control$  | stats count by infected_components{} | sort -count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
         </search>
-        <option name="drilldown">cell</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">all</option>
         <option name="refresh.display">progressbar</option>
-      </table>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Impacted Artifacts</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$  | stats count by impacted_artifacts{} | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
     </panel>
   </row>
-  <row>
+  <row id="vulnerability6">
     <panel>
-      <table>
-        <title>Recent vulnerabilities information</title>
+      <chart>
+        <title>Top Vulnerable Artifacts by Downloads (Based on Username)</title>
         <search>
-          <query>index="xray_violations" | sort -created | fields "created", "severity", "cve", "impacted_artifacts{}", "signature", "summary", "url", "category" | fields - _raw | fields - _time | rename signature as watch_name</query>
+          <query>index="main" $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts{}=* | stats count by impacted_artifacts{}  | rex field=impacted_artifacts{} "default\/(?&lt;rex_repo_path&gt;.*)" | return 500000 $rex_repo_path] | stats count(username) by request_url | rename request_url as impacted_artifact</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Top Vulnerable Artifacts by Downloads (Based on IP Address)</title>
+        <search>
+          <query>index="main" $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts{}=* | stats count by impacted_artifacts{}  | rex field=impacted_artifacts{} "default\/(?&lt;rex_repo_path&gt;.*)" | return 500000 $rex_repo_path] | stats count(remote_address) by request_url | rename request_url as impacted_artifact</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.drilldown">all</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="vulnerability7">
+    <panel>
+      <chart>
+        <title>Top Violations</title>
+        <search>
+          <query>index="xray_violations" $vulnerability_control$ cve!="null" | stats count by cve | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="charting.axisLabelsY.majorUnit">1</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row id="vulnerability8">
+    <panel>
+      <table>
+        <title>Violation Details</title>
+        <search>
+          <query>index=xray_violations $vulnerability_control$ impacted_artifacts{}=* | rex field=impacted_artifacts{} "default(?&lt;request_url&gt;.*)" | table impacted_artifacts{},created, severity, cve, request_url, signature, description, url, category | join type=outer request_url [search index="main" log_source="jfrog.rt.artifactory.request" return_status=200 | stats count(username) as user_count, count(remote_address) as ip_count by request_url] |  eval user_count=(if(user_count&gt;0,user_count,0)) | eval ip_count=(if(ip_count&gt;0,ip_count,0)) | fields - request_url | sort -user_count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
         </search>
         <option name="count">5</option>
-        <option name="drilldown">cell</option>
+        <option name="drilldown">row</option>
         <option name="refresh.display">progressbar</option>
+        <drilldown>
+          <link target="_blank">search?q=index%3D%22main%22%20log_source%3D%22jfrog.rt.artifactory.request%22%20return_status%3D200%20%5Bsearch%20index%3Dxray_violations%20impacted_artifacts{}="$row.impacted_artifacts{}$"%20%7C%20stats%20count%20by%20impacted_artifacts%7B%7D%20%20%7C%20rex%20field%3Dimpacted_artifacts%7B%7D%20%22default%5C%2F(%3F%3Crex_repo_path%3E.*)%22%20%7C%20return%20500000%20%24rex_repo_path%5D%20%7C%20table%20remote_address%2C%20request_url%2C%20username&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+        </drilldown>
       </table>
     </panel>
   </row>
