@@ -377,7 +377,7 @@
         <option name="drilldown">row</option>
         <option name="refresh.display">progressbar</option>
         <drilldown>
-          <link target="_blank">search?q=index%3D%22main%22%20log_source%3D%22jfrog.rt.artifactory.request%22%20return_status%3D200%20%5Bsearch%20index%3Dxray_violations%20impacted_artifacts{}="$row.impacted_artifacts{}$"%20%7C%20stats%20count%20by%20impacted_artifacts%7B%7D%20%20%7C%20rex%20field%3Dimpacted_artifacts%7B%7D%20%22default%5C%2F(%3F%3Crex_repo_path%3E.*)%22%20%7C%20return%20500000%20%24rex_repo_path%5D%20%7C%20table%20remote_address%2C%20request_url%2C%20username&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+          <link target="_blank">search?q=index%3D%22main%22%20log_source%3D%22jfrog.rt.artifactory.request%22%20return_status%3D200%20%5Bsearch%20index%3Dxray_violations%20impacted_artifacts{}="$row.impacted_artifacts{}$"%20%7C%20stats%20count%20by%20impacted_artifacts%7B%7D%20%20%7C%20rex%20field%3Dimpacted_artifacts%7B%7D%20%22default%5C%2F(%3F%3Crex_repo_path%3E.*)%22%20%7C%20return%20500000%20%24rex_repo_path%5D%20%7C%20table%20remote_address%2C%20_time%2C%20request_url%2C%20username&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
         </drilldown>
       </table>
     </panel>
