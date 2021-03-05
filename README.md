@@ -363,13 +363,15 @@ An alert is also available to enable if desired that will allow you to send emai
 
 ## Xray Violations
 
-With Xray integration, new widgets have been added to provide insights into the type, frequency and volume of violations that are reported as a result of Xray scanning.  
+With the Xray integration, new widgets have been added to provide insights into the type, frequency and volume of violations that are reported as a result of Xray scanning.
 
-The vulnerability count widget provides a historical summary of all the high, medium and low level vulnerabilities reported over a selectable time period.  For example, customers can quickly view the number of critical (high level) vulnerabilities that have been reported by Xray over the time.  
+Customers can get an aggregated snapshot of all the violations, watch policies, and the total number of infected artifacts and components within their environment.  This information is also organized by watch, by policy, by type and by severity to provide deeper segmentation and analysis.  
 
-The top 10 CVE table provides information about the most frequently occurring vulnerabilities over a period of time. 
+Violation trends are provided through time-series charts that track license issues and security vulnerabilities over time.  Customers can also gain insights into top vulnerabilities, the most impacted components and artifacts, and the most downloaded infected artifacts, to under the overall impact of a vulnerable artifact. 
 
-The vulnerability table provides additional information on each of the violations including the time of occurence, type of violation, impacted artifacts and other details that allow customers to trace the impact of the violation. 
+The Violation Detail table provides additional information on each of the violations including the time of occurence, the type of violation and the impacted artifact, including the count of the users that have downloaded the vulnerable artifact.
+
+Customers are also able to drill down from each of the charts and the violation detail table to view details about the CVE, the artifact, the components and the users impacted by a specific violation.
 
 
 ## CIM Compatibility
