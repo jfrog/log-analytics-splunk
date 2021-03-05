@@ -346,7 +346,7 @@
   <row id="vulnerability7">
     <panel>
       <chart>
-        <title>Top Violations</title>
+        <title>Top Vulnerabilities</title>
         <search>
           <query>index="xray_violations" $vulnerability_control$ cve!="null" | stats count by cve | sort -count</query>
           <earliest>$field1.earliest$</earliest>
