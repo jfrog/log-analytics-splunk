@@ -1,3 +1,6 @@
+## [1.1.5] - Mar 2nd, 2021
+* Adding Violations widgets to Xray dashboard
+
 ## [1.1.4] - Feb 19th, 2021
 * Normalizing access and request logs to Splunk Web and Change CIM
 * Added eventtypes, tags, fields, macros to the app
