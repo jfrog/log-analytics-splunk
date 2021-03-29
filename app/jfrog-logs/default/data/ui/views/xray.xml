@@ -312,7 +312,7 @@
   <row id="vulnerability6">
     <panel>
       <chart>
-        <title>Top Vulnerable Artifacts by Downloads (Based on Username)</title>
+        <title>Top Impacted Artifact by Count of User Downloads</title>
         <search>
           <query>index="jfrog_splunk" $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(username) by request_url | rename request_url as impacted_artifact</query>
           <earliest>$field1.earliest$</earliest>
@@ -328,7 +328,7 @@
     </panel>
     <panel>
       <chart>
-        <title>Top Vulnerable Artifacts by Downloads (Based on IP Address)</title>
+        <title>Top Impacted Artifact by Count of IP Download</title>
         <search>
           <query>index="jfrog_splunk" $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(remote_address) by request_url | rename request_url as impacted_artifact</query>
           <earliest>$field1.earliest$</earliest>
