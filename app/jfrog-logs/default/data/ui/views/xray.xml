@@ -314,7 +314,7 @@
       <chart>
         <title>Top Impacted Artifact by Count of User Downloads</title>
         <search>
-          <query>index="jfrog_splunk" $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(username) by request_url | rename request_url as impacted_artifact</query>
+          <query>`default_index` $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(username) by request_url | rename request_url as impacted_artifact</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -330,7 +330,7 @@
       <chart>
         <title>Top Impacted Artifact by Count of IP Download</title>
         <search>
-          <query>index="jfrog_splunk" $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(remote_address) by request_url | rename request_url as impacted_artifact</query>
+          <query>`default_index` $vulnerability_control$ log_source="jfrog.rt.artifactory.request" return_status=200 [search index=xray_violations impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(remote_address) by request_url | rename request_url as impacted_artifact</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -367,7 +367,7 @@
       <table>
         <title>Violation Details</title>
         <search>
-          <query>index=xray_violations $vulnerability_control$ impacted_artifacts_url{}=* | rex field=impacted_artifacts_url{} "(?&lt;request_url&gt;.*)" | table impacted_artifacts_url{}, impacted_artifacts{}, created, severity, cve, request_url, signature, description, url, category | join type=outer request_url [search index="jfrog_splunk" log_source="jfrog.rt.artifactory.request" return_status=200 | stats count(username) as user_count, count(remote_address) as ip_count by request_url] |  eval user_count=(if(user_count&gt;0,user_count,0)) | eval ip_count=(if(ip_count&gt;0,ip_count,0)) | fields - request_url, - impacted_artifacts_url{} | sort -user_count</query>
+          <query>index=xray_violations $vulnerability_control$ impacted_artifacts_url{}=* | rex field=impacted_artifacts_url{} "(?&lt;request_url&gt;.*)" | table impacted_artifacts_url{}, impacted_artifacts{}, created, severity, cve, request_url, signature, description, url, category | join type=outer request_url [search `default_index` log_source="jfrog.rt.artifactory.request" return_status=200 | stats count(username) as user_count, count(remote_address) as ip_count by request_url] |  eval user_count=(if(user_count&gt;0,user_count,0)) | eval ip_count=(if(ip_count&gt;0,ip_count,0)) | fields - request_url, - impacted_artifacts_url{} | sort -user_count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -377,7 +377,7 @@
         <option name="drilldown">row</option>
         <option name="refresh.display">progressbar</option>
         <drilldown>
-          <link target="_blank">search?q=index%3D%22jfrog_splunk%22%20log_source%3D%22jfrog.rt.artifactory.request%22%20return_status%3D200%20%5Bsearch%20index%3Dxray_violations%20impacted_artifacts{}="$row.impacted_artifacts{}$"%20%7C%20stats%20count%20by%20impacted_artifact_url%7B%7D%20%20%7C%20rex%20field%3Dimpacted_artifact_url%7B%7D%20%22(%3F%3Crex_repo_path%3E.*)%22%20%7C%20return%20500000%20%24rex_repo_path%5D%20%7C%20table%20remote_address%2C%20_time%2C%20request_url%2C%20username&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
+          <link target="_blank">search?q=%60default_index%60%20log_source%3D%22jfrog.rt.artifactory.request%22%20return_status%3D200%20%5Bsearch%20index%3Dxray_violations%20impacted_artifacts{}="$row.impacted_artifacts{}$"%20%7C%20stats%20count%20by%20impacted_artifacts_url%7B%7D%20%20%7C%20rex%20field%3Dimpacted_artifacts_url%7B%7D%20%22(%3F%3Crex_repo_path%3E.*)%22%20%7C%20return%20500000%20%24rex_repo_path%5D%20%7C%20table%20remote_address%2C%20_time%2C%20request_url%2C%20username&amp;earliest=$field1.earliest$&amp;latest=$field1.latest$</link>
         </drilldown>
       </table>
     </panel>
