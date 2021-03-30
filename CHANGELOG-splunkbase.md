@@ -1,3 +1,6 @@
+## [1.1.6] - Mar 30th, 2021
+* Renaming widgets, fixing search queries in Xray Violations Dashboard
+
 ## [1.1.5] - Mar 2nd, 2021
 * Adding Violations widgets to Xray dashboard
 

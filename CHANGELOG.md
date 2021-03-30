@@ -1,6 +1,9 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
+## [0.11.1] - Mar 30, 2021
+* Renaming widgets, fixing search queries in Xray Violations Dashboard
+
 ## [0.11.0] - Mar 3, 2021
 * Adding Violations widgets to Xray dashboard
 
