@@ -151,7 +151,7 @@
       <single>
         <title>Dockerhub Pull Requests Trends Per 6 Hours</title>
         <search>
-          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="downloading */manifests/sha256:*" | timechart count(message) span=6h as DockerPullRequests</query>
+          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart count(message) span=6h as DockerPullRequests</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -180,7 +180,7 @@
       <chart>
         <title>Dockerhub Pull Requests in rolling 6 Hr window</title>
         <search>
-          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="downloading */manifests/sha256:*" | timechart span=1h count(message) as Count | streamstats sum(Count) as Count window=6 | eval warning = 100 | eval critical = 200</query>
+          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart span=1h count(message) as Count | streamstats sum(Count) as Count window=6 | eval warning = 100 | eval critical = 200</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -198,7 +198,7 @@
       <chart>
         <title>Dockerhub Pull Requests Total</title>
         <search>
-          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="downloading */manifests/sha256:*" | timechart count(message) as Count</query>
+          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart count(message) as Count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>

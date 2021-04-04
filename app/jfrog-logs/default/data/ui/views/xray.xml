@@ -243,7 +243,7 @@
       <chart>
         <title>Violation Types over Time (Stats)</title>
         <search>
-          <query>index="xray_violations" $vulnerability_control$ | timechart count by category</query>
+          <query>index="xray_violations" category!=NULL $vulnerability_control$ | timechart count by category</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
