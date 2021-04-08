@@ -1,3 +1,6 @@
+## [1.1.8] - Apr 12th, 2021
+* Fixing violation data correlation with user, ip information
+
 ## [1.1.7] - Apr 5th, 2021
 * Fixing bugs in Dockerhub widgets, Xray Violations Dashboard
 
