@@ -367,7 +367,7 @@
       <table>
         <title>Violation Details</title>
         <search>
-          <query>index=xray_violations $vulnerability_control$ impacted_artifacts_url{}=* | rex field=impacted_artifacts_url{} "(?&lt;rep_path&gt;.*)"| eval repo_path= rep_path." " | table impacted_artifacts_url{}, impacted_artifacts{}, created, severity, cve, repo_path, signature, description, url, category | join type=outer repo_path [search `default_index` log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" | stats count(username) as user_count, count(ip) as ip_count by repo_path] |  eval user_count=(if(user_count&gt;0,user_count,0)) | eval ip_count=(if(ip_count&gt;0,ip_count,0)) | fields - repo_path, - impacted_artifacts_url{} | sort -user_count</query>
+          <query>index=xray_violations $vulnerability_control$ impacted_artifacts_url{}=* | rex field=impacted_artifacts_url{} "(?&lt;repo_path&gt;.*)" | table impacted_artifacts_url{}, impacted_artifacts{}, created, severity, cve, repo_path, signature, description, url, category | join type=outer repo_path [search `default_index` log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" | stats count(username) as user_count, count(ip) as ip_count by repo_path] |  eval user_count=(if(user_count&gt;0,user_count,0)) | eval ip_count=(if(ip_count&gt;0,ip_count,0)) | fields - repo_path, - impacted_artifacts_url{} | sort -user_count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
