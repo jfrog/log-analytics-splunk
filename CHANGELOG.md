@@ -1,6 +1,9 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
+## [0.11.2] - Apr 12, 2021
+* Fixing violation data correlation with user, ip information
+
 ## [0.11.2] - Apr 5, 2021
 * Fixing bugs in Dockerhub widgets, Xray Violations Dashboard
 
