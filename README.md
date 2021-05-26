@@ -14,9 +14,27 @@
 | 0.2.0   | 7.7.3       | 3.8.0  | N/A          | N/A             | N/A       | 8.0.5 Build: a1a6394cc5ae |
 | 0.1.1   | 7.6.3       | 3.6.2  | N/A          | N/A             | N/A       | 8.0.5 Build: a1a6394cc5ae |
 
-## Splunk Configuration
-
+## Table of Contents
 `Note! You must follow the order of the steps throughout Splunk Configuration`
+
+1. [Splunk Setup](#splunk-setup)
+2. [Environment Configuration](#environment-configuration)
+3. [Fluentd Installation](#fluentd-installation)
+    * [OS / Virtual Machine](#os--virtual-machine)
+    * [Docker](#docker)
+    * [Kubernetes Deployment with Helm](#kubernetes-deployment-with-helm)
+    * [Kubernetes Deployment without Helm](#kubernetes-deployment-without-helm)
+4. [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk)
+    * [Configuration steps for Artifactory](#configuration-steps-for-artifactory)
+    * [Configuration steps for Xray](#configuration-steps-for-xray)
+    * [Configuration steps for Mission Control](#configuration-steps-for-mission-control)
+    * [Configuration steps for Distribution](#configuration-steps-for-distribution)
+    * [Configuration steps for Pipelines](#configuration-steps-for-pipelines)
+5. [Dashboards](#dashboards)
+6. [Splunk Demo](#splunk-demo)
+7. [References](#references)
+
+## Splunk Setup
 
 ### Splunkbase App
 
@@ -31,7 +49,6 @@ Install the `JFrog Log Analytics Platform` app from Splunkbase [here!](https://s
 6. Click upgrade 
 7. Click upload
 ````
-
 
 Restart Splunk post installation of App.
 
@@ -60,16 +77,6 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Click "Save"
 ````
 
-#### Create index xray_violations
-````text 
-1. Open Splunk web console as adminstrator
-2. Click on "Settings" in dropdown select "Indexes"
-3. Click on "New Index"
-4. Enter Index name as xray_violations
-5. Click "Save"
-````   
-
-
 #### Configure new HEC token to receive Logs
 ````text
 1. Open Splunk web console as adminstrator
@@ -86,63 +93,240 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 12. Save the generated token value
 ````
 
-#### Configure new HEC token to receive Xray Violations
-````text 
-1. Open Splunk web cobsole as administrator
-2. Click on "Settings" in dropdown select "Data inputs"
-3. Click on "HTTP Event Collector"
-4. Click on "New Token"
-5. Enter a "Name" in the textbox
-6. (Optional) Enter a "Description" in the textbox
-7. Click on the green "Next" button
-8. Select sourcetype by Clicking on Select > Select Source Type dropdown > Structured > _json
-9. Add "xray_violations" index to store the JFrog platform log data into.
-10. Click on the green "Review" button
-11. If good, Click on the green "Done" button
-12. Save the generated token value
+## Environment Configuration
+
+We rely heavily on environment variables so that the correct log files are streamed to your observalibity dashboards. Ensure that you set the JF_PRODUCT_DATA_INTERNAL environment variable to the correct path for your product
+
+The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location.
+
+Helm based installs will already have this defined based upon the underlying docker images.
+
+For non-k8s based installations below is a reference to the Docker image locations per product. Note these locations may be different based upon the installation location chosen.
+
+````text
+Artifactory: 
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/artifactory/
 ````
 
-### Configure Fluentd Splunk Output
-
-#### Download fluentd.conf
-Artifactory: 
 ````text
+Xray:
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/xray/
+````
+
+````text
+Mision Control:
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/mc/
+````
+
+````text
+Distribution:
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/distribution/
+````
+
+````text
+Pipelines:
+export JF_PRODUCT_DATA_INTERNAL=/opt/jfrog/pipelines/var/
+````
+
+## Fluentd Installation
+
+### OS / Virtual Machine
+
+Ensure you have access to the Internet from VM. Recommended install is through fluentd's native OS based package installs:
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| CentOS/RHEL   | RPM (YUM)       | https://docs.fluentd.org/installation/install-by-rpm |
+| Debian/Ubuntu | APT             | https://docs.fluentd.org/installation/install-by-deb |
+| MacOS/Darwin  | DMG             | https://docs.fluentd.org/installation/install-by-dmg |
+| Windows       | MSI             | https://docs.fluentd.org/installation/install-by-msi |
+
+User installs can utilize the zip installer for Linux
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+
+Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+````
+
+Untar to create the folder:
+````text
+tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
+````
+Move into the new folder:
+
+````text
+cd fluentd-1.11.0-linux-x86_64
+````
+
+Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
+
+````text
+./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
+````
+
+### Docker
+
+Recommended install for Docker is to utilize the zip installer for Linux
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+
+Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+````
+
+Untar to create the folder:
+````text
+tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
+````
+Move into the new folder:
+
+````text
+cd fluentd-1.11.0-linux-x86_64
+````
+
+Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
+
+````text
+./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
+````
+
+### Kubernetes Deployment with Helm
+
+Recommended installation for Kubernetes is to utilize the helm chart with the associated values.yaml in this repo.
+
+| Product | Example Values File |
+|---------|-------------|
+| Artifactory | helm/artifactory-values.yaml |
+| Artifactory HA | helm/artifactory-ha-values.yaml |
+| Xray | helm/xray-values.yaml |
+
+Update the values.yaml associated to the product you want to deploy with your Splunk settings.
+
+Then deploy the helm chart as described below:
+
+Add JFrog Helm repository:
+
+```text
+helm repo add jfrog https://charts.jfrog.io
+helm repo update
+```
+
+Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each of them, use the command
+``openssl rand -hex 32``
+
+Artifactory ⎈:
+
+Replace the `splunk.example.com` in `splunk.host` at the end of the yaml file with IP address or DNS of Splunk HEC
+
+Replace the `splunk_hec_token` in `splunk.token` at the end of the yaml file with the HEC Token created in [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs) section and then run the following helm command:
+
+```text
+helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
+       --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+       --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+       -f helm/artifactory-values.yaml
+```
+
+Artifactory-HA ⎈:
+
+For HA installation, please create a license secret on your cluster prior to installation.
+
+```text
+kubectl create secret generic artifactory-license --from-file=<path_to_license_file>artifactory.cluster.license 
+```
+
+Note: Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each of them, use the command
+``openssl rand -hex 32``
+
+Replace the `splunk.example.com` in `splunk.host` at the end of the yaml file with splunk IP address or DNS of Splunk HEC
+
+Replace the `splunk_hec_token` in `splunk.token` at the end of the yaml file with the HEC Token created in [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs) section and then run the following helm command:
+
+```text
+helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
+       --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+       --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+       -f helm/artifactory-ha-values.yaml
+```
+
+Xray ⎈:
+
+Update the following fields in `/helm/xray-values.yaml`:
+
+Replace the `splunk.example.com` in `splunk.host` at the end of the yaml file with splunk IP address or DNS of Splunk HEC
+
+Replace the `splunk_hec_token` in `splunk.token` at the end of the yaml file with the HEC Token created in [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs) section
+
+Replace `jfrog_user` in `jfrog.siem.username` with Artifactory username 
+
+Replace `jfrog_api_key` in `jfrog.siem.apikey` with [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) and then run the following helm command:
+
+Use the same `joinKey` as you used in Artifactory installation to allow Xray node to successfully connect to Artifactory.
+
+```text
+helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=http://my-artifactory-nginx-url \
+       --set xray.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+       --set xray.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+       -f helm/xray-values.yaml
+```
+
+### Kubernetes Deployment without Helm
+
+To modify existing Kubernetes based deployments without using Helm, users can use the zip installer for Linux:
+
+| OS            | Package Manager | Link |
+|---------------|-----------------|------|
+| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+
+Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+````
+
+Untar to create the folder:
+````text
+tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
+````
+Move into the new folder:
+
+````text
+cd fluentd-1.11.0-linux-x86_64
+````
+Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
+
+````text
+./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
+````
+
+## Fluentd Configuration for Splunk
+
+Download and configure the relevant fluentd.conf files for Splunk
+
+### Configuration steps for Artifactory
+
+Download the artifactory fluentd configuration file to a directory the user has permissions to write, such as the $JF_PRODUCT_DATA_INTERNAL locations discussed above in the [Environment Configuration](#environment-configuration) section.
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
 wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt
 ````
 
-Xray:
-````text
-wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray
-wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/siem/splunk_siem.conf
-````
+Override the match directive(last section) of the downloaded `fluent.conf.rt` with the details given below
 
-Mision Control:
-````text
-wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.missioncontrol
-````
-
-Distribution:
-````text
-wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.distribution
-````
-
-Pipelines:
-````text
-wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.pipelines
-````
-
-#### Configure fluentd configuration files
-
-Users need to specify the following match directive parameters in fluent.conf and splunk_siem.conf files
-
-````text
-HEC_HOST   -> IP address or DNS of Splunk HEC 
-HEC_PORT   -> Splunk HEC port default is 8088
-HEC_TOKEN  -> Saved generated token above
-````
-
-These values override the last section of the `fluentd.conf` and `splunk_siem.conf` shown below:
-``` 
+```
 <match jfrog.**>
   @type splunk_hec
   host HEC_HOST
@@ -158,223 +342,190 @@ These values override the last section of the `fluentd.conf` and `splunk_siem.co
 </match>
 ```
 
-If ssl is enabled the ca_file will be used and must be supplied.
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
-index in match directive is `jfrog_splunk` for fluent configurations and `xray_violations` for siem configuration
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
-#### Configure splunk_siem.conf
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-Integration is done by setting up Xray. Obtain JPD url and access token for API. Configure the source directive parameters specified below
+If ssl is enabled, ca file will be used and must be supplied
 
-* **tag** (string) (required): The value is the tag assigned to the generated events.
-* **jpd_url** (string) (required): JPD url required to pull Xray SIEM violations
-* **access_token** (string) (required): [Access token](https://www.jfrog.com/confluence/display/JFROG/Access+Tokens) to authenticate Xray
-* **pos_file** (string) (required): Position file to record last SIEM violation pulled
-* **thread_count** (integer) (optional): Number of workers to process violation records in thread pool
-    * Default value: `5`
-* **wait_interval** (integer) (optional): Wait interval between pulling new events
-    * Default value: `60`
+### Configuration steps for Xray
 
-## Required Environment Variable
-
-`JF_PRODUCT_DATA_INTERNAL` is required check if already set if not see example values below:
-
-Artifactory: 
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/artifactory/
-````
-
-Xray:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/xray/
-````
-
-Mision Control:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/mc/
-````
-
-Distribution:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/distribution/
-````
-
-Pipelines:
-````text
-export JF_PRODUCT_DATA_INTERNAL=/opt/jfrog/pipelines/var/
-````
-
-
-## Fluentd Install
-
-### OS / Virtual Machine
-
-Recommended install is through fluentd's native OS based package installs:
-
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| CentOS/RHEL   | RPM (YUM)       | https://docs.fluentd.org/installation/install-by-rpm |
-| Debian/Ubuntu | APT             | https://docs.fluentd.org/installation/install-by-deb |
-| MacOS/Darwin  | DMG             | https://docs.fluentd.org/installation/install-by-dmg |
-| Windows       | MSI             | https://docs.fluentd.org/installation/install-by-msi |
-
-User installs can utilize the zip installer for Linux
-
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
-
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above:
+Download the Xray fluentd configuration file to a directory the user has permissions to write, such as the $JF_PRODUCT_DATA_INTERNAL locations discussed above in the [Environment Configuration](#environment-configuration) section.
 
 ````text
 cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray
 ````
 
-Untar to create the folder:
-````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
+Fill in the JPD_URL, USER, JFROG_API_KEY fields in the source directive of the downloaded `fluent.conf.xray` with the details given below
 
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
-Run the fluentd wrapper with one argument pointed to the configuration file to load:
+```text
+<source>
+  @type jfrog_siem
+  tag jfrog.xray.siem.vulnerabilities
+  jpd_url JPD_URL
+  username USER
+  apikey JFROG_API_KEY
+  pos_file "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
+</source>
+```
 
-````text
-./fluentd test.conf
-````
+_**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<ip_address>` with is used to pull Xray Violations
 
-Next steps are to setup a  `fluentd.conf` file using the relevant integrations for Splunk, DataDog, Elastic, or Prometheus.
+_**required**_: ```USER``` is the Artifactory username for authentication
 
-### Docker
+_**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
 
-Recommended install for Docker is to utilize the zip installer for Linux
+Override the match directive (last section) of the downloaded `fluent.conf.xray` with the details given below
 
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+```
+<match jfrog.**>
+  @type splunk_hec
+  host HEC_HOST
+  port HEC_PORT
+  token HEC_TOKEN
+  index jfrog_splunk
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
+```
 
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above:
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
+
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
+
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
+
+If ssl is enabled, ca file will be used and must be supplied
+
+### Configuration steps for Mission Control
+``
+Download the Mission Control fluentd configuration file to a directory the user has permissions to write, such as the $JF_PRODUCT_DATA_INTERNAL locations discussed above in the [Environment Configuration](#environment-configuration) section.
 
 ````text
 cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.missioncontrol
 ````
 
-Untar to create the folder:
-````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
+Override the match directive(last section) of the downloaded `fluent.conf.missioncontrol` with the details given below
 
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
-Run the fluentd wrapper with one argument pointed to the configuration file to load:
-
-````text
-./fluentd test.conf
-````
-
-Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Splunk.
-
-### Kubernetes
-
-Recommended install for Kubernetes is to utilize the helm chart with the associated values.yaml in this repo.
-
-| Product | Example Values File |
-|---------|-------------|
-| Artifactory | helm/artifactory-values.yaml |
-| Artifactory HA | helm/artifactory-ha-values.yaml |
-| Xray | helm/xray-values.yaml |
-
-Update the values.yaml associated to the product you want to deploy with your Splunk settings.
-
-Then deploy the helm chart such as below:
-
-Artifactory ⎈:
-```text
-helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
-       --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
-       --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
-       -f helm/artifactory-values.yaml
+```
+<match jfrog.**>
+  @type splunk_hec
+  host HEC_HOST
+  port HEC_PORT
+  token HEC_TOKEN
+  index jfrog_splunk
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
 ```
 
-Artifactory-HA ⎈:
-```text
-helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
-       --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
-       --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
-       -f helm/artifactory-ha-values.yaml
-```
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
-Xray ⎈:
-```text
-helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=http://my-artifactory-nginx-url \
-       --set xray.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
-       --set xray.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
-       -f helm/xray-values.yaml
-```
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
-#### Kubernetes Deployment without Helm
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-To modify existing Kubernetes based deployments without using Helm users can use the zip installer for Linux:
+If ssl is enabled, ca file will be used and must be supplied
 
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+### Configuration steps for Distribution
 
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above:
+Download the distribution fluentd configuration file to a directory the user has permissions to write, such as the $JF_PRODUCT_DATA_INTERNAL locations discussed above in the [Environment Configuration](#environment-configuration) section.
 
 ````text
 cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
+wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.distribution
 ````
 
-Untar to create the folder:
+Override the match directive(last section) of the downloaded `fluent.conf.distribution` with the details given below
+
+```
+<match jfrog.**>
+  @type splunk_hec
+  host HEC_HOST
+  port HEC_PORT
+  token HEC_TOKEN
+  index jfrog_splunk
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
+```
+
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
+
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
+
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
+
+If ssl is enabled, ca file will be used and must be supplied
+
+### Configuration steps for Pipelines
+
+Download the pipelines fluentd configuration file to a directory the user has permissions to write, such as the $JF_PRODUCT_DATA_INTERNAL locations discussed above in the [Environment Configuration](#environment-configuration) section.
+
 ````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
-
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
-Run the fluentd wrapper with one argument pointed to the configuration file to load:
-
-````text
-./fluentd test.conf
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.pipelines
 ````
 
-Next steps are to setup a  `fluentd.conf` file using the relevant configuration files for Splunk.
+Override the match directive(last section) of the downloaded `fluent.conf.pipelines` with the details given below
 
+```
+<match jfrog.**>
+  @type splunk_hec
+  host HEC_HOST
+  port HEC_PORT
+  token HEC_TOKEN
+  index jfrog_splunk
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
+```
 
-## Dockerhub Pull Requests
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
-To monitor Dockerhub pull requests users should have a Dockerhub account either paid or free.
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
-Free accounts allow up to 200 pull requests per 6 hour window.
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-Various widgets have been added in the new Docker tab under Artifactory to help monitor your Dockerhub pull requests.
+If ssl is enabled, ca file will be used and must be supplied
 
-An alert is also available to enable if desired that will allow you to send emails or add outbound webhooks through configuration to be notified when you exceed the configurable threshold.
+## Dashboards
 
-## Xray Violations
+### Artifactory dashboard
+JFrog Artifactory Dashboard is divided into three sections Application, Audit, Requests and Docker
 
-With the Xray integration, new widgets have been added to provide insights into the type, frequency and volume of violations that are reported as a result of Xray scanning.
+* **Application** - This section tracks Log Volume(information about different log sources) and Artifactory Errors over time(bursts of application errors that may otherwise go undetected)
+* **Audit** - This section tracks audit logs help you determine who is accessing your Artifactory instance and from where. These can help you track potentially malicious requests or processes (such as CI jobs) using expired credentials.
+* **Requests** - This section tracks HTTP response codes, Top 10 IP addresses for uploads and downloads
+* **Docker** - To monitor Dockerhub pull requests users should have a Dockerhub account either paid or free. Free accounts allow up to 200 pull requests per 6 hour window. Various widgets have been added in the new Docker tab under Artifactory to help monitor your Dockerhub pull requests. An alert is also available to enable if desired that will allow you to send emails or add outbound webhooks through configuration to be notified when you exceed the configurable threshold.
 
-Customers can get an aggregated snapshot of all the violations, watch policies, and the total number of infected artifacts and components within their environment.  This information is also organized by watch, by policy, by type and by severity to provide deeper segmentation and analysis.  
+### Xray dashboard
+JFrog Xray Dashboard is divided into two sections Logs and Violations
 
-Violation trends are provided through time-series charts that track license issues and security vulnerabilities over time.  Customers can also gain insights into top vulnerabilities, the most impacted components and artifacts, and the most downloaded infected artifacts, to under the overall impact of a vulnerable artifact. 
+* **Logs** - This dashboard provides a summary of access, service and traffic log volumes associated with Xray. Additionally, customers are also able to track various HTTP response codes, HTTP 500 errors, and log errors for greater operational insight
+* **Violations** - This dashboard provides an aggregated summary of all the license violations and security vulnerabilities found by Xray.  Information is segment by watch policies and rules.  Trending information is provided on the type and severity of violations over time, as well as, insights on most frequently occurring CVEs, top impacted artifacts and components.  
 
-The Violation Detail table provides additional information on each of the violations including the time of occurence, the type of violation and the impacted artifact, including the count of the users that have downloaded the vulnerable artifact.
-
-Customers are also able to drill down from each of the charts and the violation detail table to view details about the CVE, the artifact, the components and the users impacted by a specific violation.
-
-
-## CIM Compatibility
+### CIM Compatibility
 
 Log data from JFrog platform logs is translated to pre-defined Common Information Models (CIM) compatible with Splunk. This compatibility enables new advanced features where users can search and access JFrog log data that is compatible with data models. For example
 
