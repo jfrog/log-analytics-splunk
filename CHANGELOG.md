@@ -1,6 +1,13 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
+## [0.12.0] - May 26, 2021
+### Breaking Changes
+* Using unified fluentd configuration for Xray Logs and Violations dashboards
+* Using APIKey to authenticate Xray Violations (SIEM fluentd input plugin)
+* Sending Xray logs and violation data to the same index
+* Using log_source to filter in Xray Violations dashboard queries
+
 ## [0.11.2] - Apr 12, 2021
 * Fixing violation data correlation with user, ip information
 

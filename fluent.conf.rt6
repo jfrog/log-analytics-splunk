@@ -89,6 +89,13 @@
     features ${return(record.map { |k,v| { "featureId" => (k + ':' + v).to_sym} })}
   </record>
 </filter>
+<filter jfrog.rt.artifactory.access>
+  @type record_transformer
+  enable_ruby true
+  <record>
+    impacted_artifacts ${if record['repo_path'].length > 1; "default/" + record["repo_path"].split(':')[0] + "/" + record["repo_path"].split(':')[1].rstrip ; end;}
+  </record>
+</filter>
 <match jfrog.callhome>
   @type http
   endpoint http://localhost:8081/artifactory/api/system/usage

@@ -1,3 +1,10 @@
+## [1.2.0] - May 26, 2021
+### Breaking Changes
+* Using unified fluentd configuration for Xray Logs and Violations dashboards
+* Using APIKey to authenticate Xray Violations (SIEM fluentd input plugin)
+* Sending Xray logs and violation data to the same index
+* Using log_source to filter in Xray Violations dashboard queries
+
 ## [1.1.8] - Apr 12th, 2021
 * Fixing violation data correlation with user, ip information
 
