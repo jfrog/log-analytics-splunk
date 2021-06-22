@@ -1,3 +1,6 @@
+## [1.2.0] - Jun 22, 2021
+* App restarts after installation
+
 ## [1.2.0] - May 26, 2021
 ### Breaking Changes
 * Using unified fluentd configuration for Xray Logs and Violations dashboards
