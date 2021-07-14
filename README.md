@@ -114,6 +114,11 @@ export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/xray/
 ````
 
 ````text
+Nginx:
+export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/nginx/
+````
+
+````text
 Mision Control:
 export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/mc/
 ````
