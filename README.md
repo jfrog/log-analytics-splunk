@@ -404,8 +404,43 @@ _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new
 
 If ssl is enabled, ca file will be used and must be supplied
 
+### Configuration steps for Nginx
+
+Download the Nginx fluentd configuration file to a directory the user has permissions to write, such as the $JF_PRODUCT_DATA_INTERNAL locations discussed above in the [Environment Configuration](#environment-configuration) section.
+
+````text
+cd $JF_PRODUCT_DATA_INTERNAL
+wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.nginx
+````
+
+Override the match directive(last section) of the downloaded `fluent.conf.nginx` with the details given below
+
+```
+<match jfrog.**>
+  @type splunk_hec
+  host HEC_HOST
+  port HEC_PORT
+  token HEC_TOKEN
+  index jfrog_splunk
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
+```
+
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
+
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
+
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
+
+If ssl is enabled, ca file will be used and must be supplied
+
 ### Configuration steps for Mission Control
-``
+
 Download the Mission Control fluentd configuration file to a directory the user has permissions to write, such as the $JF_PRODUCT_DATA_INTERNAL locations discussed above in the [Environment Configuration](#environment-configuration) section.
 
 ````text
