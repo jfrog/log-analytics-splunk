@@ -52,7 +52,7 @@ common:
           name: data-volume
   customSidecarContainers: |
     - name: "xray-platform-fluentd-sidecar"
-      image: "releases-docker.jfrog.io/reg2/fluentd:1.12.3-1"
+      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.13.2"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
