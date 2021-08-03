@@ -312,9 +312,9 @@
   <row id="vulnerability6">
     <panel>
       <chart>
-        <title>Top Impacted Artifact by Count of User Downloads</title>
+        <title>Top Impacted Artifacts by Count of User Downloads</title>
         <search>
-          <query>`default_index` $vulnerability_control$ log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" [search log_source="jfrog.xray.siem.vulnerabilities" impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(username) by repo_path | rename repo_path as impacted_artifact</query>
+          <query>`default_index` $vulnerability_control$ log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" [search log_source="jfrog.xray.siem.vulnerabilities" impacted_artifacts{}=* | stats count by impacted_artifacts{} | rex field=impacted_artifacts{} "(?&lt;impacted_artifacts&gt;.*)" | return 500000 impacted_artifacts ] | stats count(username) by repo_path | rename repo_path as impacted_artifact</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -328,9 +328,9 @@
     </panel>
     <panel>
       <chart>
-        <title>Top Impacted Artifact by Count of IP Download</title>
+        <title>Top Impacted Artifacts by Count of IP Downloads</title>
         <search>
-          <query>`default_index` $vulnerability_control$ log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" [search log_source="jfrog.xray.siem.vulnerabilities" impacted_artifacts_url{}=* | stats count by impacted_artifacts_url{} | rex field=impacted_artifacts_url{} "(?&lt;impacted_artifacts_url&gt;.*)" | return 500000 $impacted_artifacts_url ] | stats count(ip) by repo_path | rename repo_path as impacted_artifact</query>
+          <query>`default_index` $vulnerability_control$ log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" [search log_source="jfrog.xray.siem.vulnerabilities" impacted_artifacts{}=* | stats count by impacted_artifacts{} | rex field=impacted_artifacts{} "(?&lt;impacted_artifacts&gt;.*)" | return 500000 impacted_artifacts ] | stats count(ip) by repo_path | rename repo_path as impacted_artifact</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
