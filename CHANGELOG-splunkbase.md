@@ -1,7 +1,7 @@
-## [1.2.1] - Aug 3, 2021
+## [1.2.2] - Aug 3, 2021
 * Fixing violation data with correlation widget fields
 
-## [1.2.0] - Jun 22, 2021
+## [1.2.1] - Jun 22, 2021
 * App restarts after installation
 
 ## [1.2.0] - May 26, 2021
