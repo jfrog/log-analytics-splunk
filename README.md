@@ -373,7 +373,8 @@ Fill in the JPD_URL, USER, JFROG_API_KEY fields in the source directive of the d
   jpd_url JPD_URL
   username USER
   apikey JFROG_API_KEY
-  pos_file "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
+  pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
+  from_date "2016-01-01"
 </source>
 ```
 
@@ -382,6 +383,8 @@ _**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<
 _**required**_: ```USER``` is the Artifactory username for authentication
 
 _**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
+_**optional**_: If not specified, value is set to current date. Setting from_date value will result in violations from the specified date
 
 Override the match directive (last section) of the downloaded `fluent.conf.xray` with the details given below
 

@@ -118,7 +118,7 @@
   jpd_url JPD_URL
   username USER
   apikey JFROG_API_KEY
-  pos_file "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
+  pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
 </source>
 <filter jfrog.xray.siem.*>
   @type record_transformer
