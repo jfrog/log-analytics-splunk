@@ -1,4 +1,4 @@
-<form script="jfrog-logs.js" stylesheet="jfrog-logs.css">
+<form version="1.1" script="jfrog-logs.js" stylesheet="jfrog-logs.css">
   <label>Artifactory</label>
   <description>Artifactory Log Analytics</description>
   <fieldset submitButton="true" autoRun="true">
