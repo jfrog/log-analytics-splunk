@@ -1,3 +1,6 @@
+## [1.2.3] - Aug 26, 2021
+* Updating jQuery version to 3.5.0 or higher
+
 ## [1.2.2] - Aug 3, 2021
 * Fixing violation data with correlation widget fields
 
