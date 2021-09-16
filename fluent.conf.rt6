@@ -61,34 +61,6 @@
     image ${record["request_url"].include?("/api/docker") && !record["request_url"].include?("/api/docker/null") && !record["request_url"].include?("/api/docker/v2")  ? (record["request_url"].split('/')[5]) : ("")}
   </record>
 </filter>
-<source>
-  @type exec
-  tag jfrog.callhome
-  command "#{ENV['ARTIFACTORY_HOME']}/fluentd-1.11.0-linux-x86_64/lib/ruby/bin/gem list --local | grep fluent | sed 's/ (/:/g' | sed 's/)//g'  | sed ':a;N;$!ba;s/\n/\t/g'"
-  run_interval 1d
-  <parse>
-    @type ltsv
-  </parse>
-</source>
-<source>
-  @type exec
-  tag jfrog.callhome
-  command /opt/td-agent/embedded/bin/gem list --local | grep fluent | sed 's/ (/:/g' | sed 's/)//g'  | sed ':a;N;$!ba;s/\n/\t/g'
-  run_interval 1d
-  <parse>
-    @type ltsv
-  </parse>
-</source>
-<filter jfrog.callhome>
-  @type record_transformer
-  renew_record true
-  keep_keys 'productId,features'
-  enable_ruby true
-  <record>
-    productId 'jfrogLogAnalytics/v0.1.1'
-    features ${return(record.map { |k,v| { "featureId" => (k + ':' + v).to_sym} })}
-  </record>
-</filter>
 <filter jfrog.rt.artifactory.access>
   @type record_transformer
   enable_ruby true
@@ -96,18 +68,6 @@
     impacted_artifacts ${if record['repo_path'].length > 1; "default/" + record["repo_path"].split(':')[0] + "/" + record["repo_path"].split(':')[1].rstrip ; end;}
   </record>
 </filter>
-<match jfrog.callhome>
-  @type http
-  endpoint http://localhost:8081/artifactory/api/system/usage
-  open_timeout 5
-  content_type application/json
-  <format>
-    @type json
-  </format>
-  <buffer>
-    flush_interval 5s
-  </buffer>
-</match>
 
 ####################
 # SPLUNK OUTPUT
