@@ -1,13 +1,30 @@
 <form version="1.1" script="jfrog-logs.js" stylesheet="jfrog-logs.css">
   <label>Artifactory</label>
-  <description>Artifactory Log Analytics</description>
+  <description>Artifactory Log Analytics and Platform Metrics</description>
   <fieldset submitButton="true" autoRun="true">
     <input type="time" token="field1" searchWhenChanged="false">
-      <label></label>
+      <label>Time of Interest</label>
       <default>
         <earliest>-24h@h</earliest>
         <latest>now</latest>
       </default>
+    </input>
+    <input type="dropdown" token="fieldspan" searchWhenChanged="false">
+      <label>Sample Granularity</label>
+      <choice value="auto">auto</choice>
+      <choice value="5s">5s</choice>
+      <choice value="10s">10s</choice>
+      <choice value="30s">30s</choice>
+      <choice value="1m">1m</choice>
+      <choice value="5m">5m</choice>
+      <choice value="10m">10m</choice>
+      <choice value="30m">30m</choice>
+      <choice value="1h">1h</choice>
+      <default>auto</default>
+      <change>
+        <eval token="timechart_span">if($value$ == "auto", "", "span=".$value$)</eval>
+        <eval token="mstats_span">"span=".$value$</eval>
+      </change>
     </input>
   </fieldset>
   <row id="tabs">
@@ -25,6 +42,9 @@
           </li>
           <li>
             <a href="#Requests" class="toggle-tab" data-toggle="tab" data-elements="requests1,requests2" data-token="requests_control">Requests</a>
+          </li>
+          <li>
+            <a href="#Metrics" class="toggle-tab" data-toggle="tab" data-elements="metrics1" data-token="metrics_control">System Metrics</a>
           </li>
         </ul>
       </html>
@@ -380,4 +400,107 @@
       </chart>
     </panel>
   </row>
+
+
+  <row id="metrics1">
+    <panel>
+      <chart>
+        <title>System Memory</title>
+        <search>
+            <query>| mstats avg("jfrog.artifactory.sys_memory_used_bytes") AS avg_used, avg("jfrog.artifactory.sys_memory_free_bytes") AS avg_free prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval mem_used_gb = (avg_used / 1024 / 1024 / 1024), mem_free_gb = (avg_free / 1024 / 1024 / 1024)
+                   | timechart avg(mem_used_gb) AS "Sys Used(GB)", avg(mem_free_gb) AS "Sys Free(GB)" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Heap Memory</title>
+        <search>
+            <query>| mstats avg("jfrog.artifactory.jfrt_runtime_heap_freememory_bytes") AS avg_heap_free, avg("jfrog.artifactory.jfrt_runtime_heap_maxmemory_bytes") AS avg_heap_max, avg("jfrog.artifactory.jfrt_runtime_heap_totalmemory_bytes") AS avg_heap_tot prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval heap_free_gb = (avg_heap_free / 1024 / 1024 / 1024), heap_max_gb = (avg_heap_max / 1024 / 1024 / 1024), heap_tot_gb =  (avg_heap_tot/ 1024 / 1024 / 1024)
+                   | timechart avg(heap_free_gb) AS "Heap Free(GB)", avg(heap_max_gb) AS "Heap Max(GB)", avg(heap_tot_gb) AS "Heap Used(GB)" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row>
+
+  <row id="metrics2">
+    <panel>
+      <chart>
+        <title>CPU Usage</title>
+        <search>
+            <query>| mstats avg("jfrog.artifactory.sys_cpu_ratio") AS cpu_ratio prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval cpu_pct = (cpu_ratio * 100)
+                   | timechart avg(cpu_pct) AS "CPU %" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>DB Connections</title>
+        <search>
+            <query>| mstats avg("jfrog.artifactory.jfrt_db_connections_max_active_total") AS db_conn_max_act, avg("jfrog.artifactory.jfrt_db_connections_min_idle_total") AS db_conn_min_idle, avg("jfrog.artifactory.jfrt_db_connections_idle_total") AS db_conn_tot_idle, avg("jfrog.artifactory.jfrt_db_connections_active_total") AS db_conn_tot_act,  prestats=false WHERE `default_metrics_index` $mstats_span$ 
+                   | timechart  avg(db_conn_min_idle) AS "Idle(Min)",  avg(db_conn_tot_act) AS "Active", avg(db_conn_tot_idle) AS "Idle" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">connect</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row>
+
 </form>
