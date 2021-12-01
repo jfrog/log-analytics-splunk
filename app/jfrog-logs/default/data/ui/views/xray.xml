@@ -1,13 +1,30 @@
-<form version="1.1" script="jfrog-logs.js" stylesheet="jfrog-logs.css">
+<form version="1.1" script="jfrog-logs.js" stylesheet="jfrog-logs.css" hideEdit="true" isDashboard="true">
   <label>Xray</label>
-  <description>Xray Log Analytics</description>
-  <fieldset submitButton="true" autoRun="true">
-    <input type="time" token="field1" searchWhenChanged="false">
-      <label></label>
+  <description>Xray Log Analytics and Platform Metrics</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label>Time of Interest</label>
       <default>
         <earliest>-24h@h</earliest>
         <latest>now</latest>
       </default>
+    </input>
+    <input type="dropdown" depends="$showspan$" token="fieldspan" searchWhenChanged="true">
+      <label>Sample Granularity</label>
+      <choice value="auto">auto</choice>
+      <choice value="5s">5s</choice>
+      <choice value="10s">10s</choice>
+      <choice value="30s">30s</choice>
+      <choice value="1m">1m</choice>
+      <choice value="5m">5m</choice>
+      <choice value="10m">10m</choice>
+      <choice value="30m">30m</choice>
+      <choice value="1h">1h</choice>
+      <default>auto</default>
+      <change>
+        <eval token="timechart_span">if($value$ == "auto", "", "span=".$value$)</eval>
+        <eval token="mstats_span">"span=".$value$</eval>
+      </change>
     </input>
   </fieldset>
   <row id="tabs">
@@ -20,7 +37,10 @@
           <li>
             <a href="#Violations" class="toggle-tab" data-toggle="tab" data-elements="vulnerability1,vulnerability2,vulnerability3,vulnerability4,vulnerability5,vulnerability6,vulnerability7,vulnerability8" data-token="vulnerability_control">Violations</a>
           </li>
-        </ul>
+          <li>
+            <a href="#Metrics" class="toggle-tab" data-toggle="tab" data-elements="metrics_01,metrics_02,metrics_03,metrics_04,metrics_06" data-token="sys_metrics_control">Metrics</a>
+          </li>
+         </ul>
       </html>
     </panel>
   </row>
@@ -382,4 +402,192 @@
       </table>
     </panel>
   </row>
+
+  <row id="metrics_01">
+    <panel>
+      <chart>
+        <title>CPU Usage</title>
+        <search>
+            <query>| mstats avg("jfrog.xray.sys_cpu_ratio") AS cpu_ratio prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval cpu_pct = (cpu_ratio * 100)
+                   | timechart avg(cpu_pct) AS "CPU %" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row>
+
+  <row id="metrics_02">
+    <panel>
+      <chart>
+        <title>System Memory</title>
+        <search>
+            <query>| mstats avg("jfrog.xray.sys_memory_used_bytes") AS avg_used, avg("jfrog.xray.sys_memory_free_bytes") AS avg_free prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval mem_used_gb = (avg_used / 1024 / 1024 / 1024), mem_free_gb = (avg_free / 1024 / 1024 / 1024)
+                   | timechart avg(mem_used_gb) AS "Sys Used(GB)", avg(mem_free_gb) AS "Sys Free(GB)" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row>
+
+  <row id="metrics_03">
+    <panel>
+      <chart>
+        <title>Disk Usage</title>
+        <search>
+            <query>| mstats avg("jfrog.xray.app_disk_free_bytes") AS avg_disk_free, avg("jfrog.xray.app_disk_used_bytes") AS avg_disk_used prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval disk_free_gb = (avg_disk_free / 1024 / 1024 / 1024), disk_used_gb = (avg_disk_used / 1024 / 1024 / 1024)
+                   | timechart avg(disk_free_gb) AS "Disk Free(GB)", avg(disk_used_gb) AS "Disk Used(GB)" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row>
+
+  <row id="metrics_04">
+    <panel>
+      <chart>
+        <title>Heap Memory</title>
+        <search>
+            <query>| mstats avg("jfrog.xray.go_memstats_heap_objects_total") AS heap_objects , avg("jfrog.xray.go_memstats_heap_allocated_bytes") AS avg_heap_max_bytes, avg("jfrog.xray.go_memstats_heap_in_use_bytes") AS avg_heap_used_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval heap_objs = (heap_objects), avg_heap_max_gb = (avg_heap_max_bytes / 1024 / 1024 / 1024), avg_heap_used_gb =  (avg_heap_used_bytes / 1024 / 1024 / 1024)
+                   | timechart avg(heap_objs) AS "No. of Objects", avg(avg_heap_max_gb) AS "Heap Max(GB)", avg(avg_heap_used_gb) AS "Heap Used(GB)" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!--row id="metrics_05">
+    <panel>
+      <chart>
+        <title>Garbage Collection</title>
+        <search>
+            <query>| mstats avg("jfrog.xray.jfrt_artifacts_gc_duration_seconds") AS gc_dur_secs, avg("jfrog.xray.jfrt_artifacts_gc_binaries_total") AS gc_binary_tot, avg("jfrog.xray.jfrt_artifacts_gc_size_cleaned_bytes") AS avg_gc_cleaned_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
+                   | eval gc_dur_min = (gc_dur_secs / 60), gc_bin_tot = (gc_binary_tot), avg_gc_cleaned_gb = (avg_gc_cleaned_bytes / 1024 / 1024 / 1024) 
+                   | timechart avg(gc_dur_min) AS "GC Duration (Minutes)", avg(gc_bin_tot) AS "GC Cleaned(Binaries)", avg(avg_gc_cleaned_gb) AS "GC Cleaned(GB)" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row-->
+
+  <row id="metrics_06">
+    <panel>
+      <chart>
+        <title>DB Connections</title>
+        <search>
+            <query>| mstats avg("jfrog.xray.db_connection_pool_in_use_total") AS db_conn_max_act, avg("jfrog.xray.jfrt_db_connections_min_idle_total") AS db_conn_min_idle, avg("jfrog.xray.db_connection_pool_idle_total") AS db_conn_tot_idle, avg("jfrog.xray.db_connection_pool_max_open_total") AS db_conn_tot_act,  prestats=false WHERE `default_metrics_index` $mstats_span$ 
+                   | timechart  avg(db_conn_min_idle) AS "Idle(Min)",  avg(db_conn_tot_act) AS "Active", avg(db_conn_tot_idle) AS "Idle" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row>
+
+  <!--row id="metrics_07">
+    <panel>
+      <chart>
+        <title>HTTP Connections</title>
+        <search>
+            <query>| mstats avg("jfrog.xray.jfrt_http_connections_max_total") AS http_conn_max_tot, avg("jfrog.xray.jfrt_http_connections_leased_total") AS http_conn_lease_tot, avg("jfrog.xray.jfrt_http_connections_pending_total") AS http_conn_pend_tot, avg("jfrog.xray.jfrt_http_connections_available_total") AS http_conn_ava_tot,  prestats=false WHERE `default_metrics_index` $mstats_span$ 
+                   | timechart  avg(http_conn_lease_tot) AS "Leased",  avg(http_conn_pend_tot) AS "Pending", avg(http_conn_ava_tot) AS "Available" $timechart_span$
+                   | fields - _span*
+            </query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
+        <option name="charting.gridLinesX.showMajorLines">true</option>
+        <option name="charting.axisY.abbreviation">auto</option>
+        <option name="charting.legend.mode">seriesCompare</option>
+        <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="displayview">analytics_workspace</option>
+      </chart>
+    </panel>
+  </row-->
+
 </form>
