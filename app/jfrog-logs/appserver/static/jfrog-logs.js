@@ -2,6 +2,8 @@ require(['jquery','underscore','splunkjs/mvc','bootstrap.tab','splunkjs/mvc/simp
 	function($, _, mvc){
 
 		var tabsInitialzed = [];
+		var metricsKey = 'metrics';
+		var spanKey = 'showspan';
 
 		/**
 		 * The below defines the tab handling logic.
@@ -87,6 +89,7 @@ require(['jquery','underscore','splunkjs/mvc','bootstrap.tab','splunkjs/mvc/simp
 
 			// clearTabControlTokens();
 			setActiveTabToken();
+			setSpanActiveForMetrics();
 
 			// Stop if the tabs have no elements
 			if( $(e.target).data("elements") === undefined ){
@@ -190,12 +193,22 @@ require(['jquery','underscore','splunkjs/mvc','bootstrap.tab','splunkjs/mvc/simp
 			}
 		};
 
+		var setSpanActiveForMetrics = function(){
+			var activeTabToken = getActiveTabToken();
+			var tokens = mvc.Components.getInstance("submitted");
+			if(activeTabToken.indexOf(metricsKey) != -1){
+				tokens.set(spanKey, "");
+			} else {
+				tokens.unset(spanKey);
+			}
+		};
+
 		/**
 		 * Handle the setting of the token for the clicked tab.
 		 * @param {*} e
 		 */
 		var setTokenForTab = function(e){
-
+			
 			// Get the token for the tab
 			var tabToken = getTabTokenForTabName($(e.target).data('token'));
 
@@ -234,6 +247,7 @@ require(['jquery','underscore','splunkjs/mvc','bootstrap.tab','splunkjs/mvc/simp
 
 			// Set the token for the selected tab
 			setActiveTabToken();
+			setSpanActiveForMetrics();
 		};
 
 		firstTimeTabSetup();
