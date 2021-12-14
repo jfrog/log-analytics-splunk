@@ -214,9 +214,37 @@
   </record>
 </filter>
 
+<source>
+  @type jfrog_metrics
+  @id metrics_http_jfrt
+  tag jfrog.metrics.artifactory
+  interval 5s
+  metric_prefix 'jfrog.artifactory'
+  jpd_url JPD_URL
+  username ADMIN_USERNAME
+  apikey API_KEY
+</source>
+
 ####################
 # SPLUNK OUTPUT
 ####################
+
+<match jfrog.metrics.**>
+  @type splunk_hec
+  data_type metric
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token METRICS_HEC_TOKEN
+  flush_interval 5s
+  source ${tag}
+  index jfrog_splunk_metrics
+  metric_name_key metric_name
+  metric_value_key value
+  <fields>
+  </fields>
+</match>
+
+
 <match jfrog.**>
   @type splunk_hec
   host HEC_HOST
