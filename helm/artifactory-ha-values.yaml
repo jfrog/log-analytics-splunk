@@ -9,7 +9,7 @@ artifactory:
         - '-c'
         - >
           mkdir -p {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/;
-          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
+          wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/Metrics_splunk/fluent.conf.rt -O {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
           name: volume
@@ -27,7 +27,13 @@ artifactory:
           sed 's/HEC_TOKEN/{{ .Values.splunk.token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
           mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
           sed 's/jfrog_splunk/{{ .Values.splunk.index }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
-          mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
+          mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          sed 's|JPD_URL|{{ .Values.jfrog.observability.metrics.jpd_url }}|g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
+          mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          sed 's/ADMIN_USERNAME/{{ .Values.jfrog.observability.metrics.username }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
+          mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          sed 's/API_KEY/{{ .Values.jfrog.observability.metrics.apikey }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf > {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new;
+          mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf.new {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
           name: volume
@@ -48,3 +54,9 @@ splunk:
   port: 8088
   token: splunk_hec_token
   index: jfrog_splunk
+jfrog:
+  observability:
+    metrics:
+      jpd_url: jpd_url
+      username: jfrog_user
+      apikey: jfrog_api_key
