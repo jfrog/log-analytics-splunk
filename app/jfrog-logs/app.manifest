@@ -1,7 +1,7 @@
 {
   "schemaVersion": "2.0.0",
   "info": {
-    "title": "JFrog Platform Log Analytics and Metrics",
+    "title": "JFrog Platform Log Analytics, Violations and Metrics",
     "id": {
       "group": null,
       "name": "jfrog-logs",
