@@ -232,9 +232,9 @@
 <match jfrog.metrics.**>
   @type splunk_hec
   data_type metric
-  hec_host HEC_HOST
-  hec_port HEC_PORT
-  hec_token METRICS_HEC_TOKEN
+  host HEC_HOST
+  port HEC_PORT
+  token METRICS_HEC_TOKEN
   flush_interval 5s
   source ${tag}
   index jfrog_splunk_metrics
