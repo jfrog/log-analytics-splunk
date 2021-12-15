@@ -237,7 +237,7 @@ Replace the `splunk.example.com` in `splunk.host` at the end of the yaml file wi
 Replace the `splunk_hec_token` in `splunk.token` at the end of the yaml file with the HEC Token created in [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs) section and then run the following helm command:
 
 ```text
-helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
+helm upgrade --install artifactory  jfrog/artifactory \
        --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
        --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
        -f helm/artifactory-values.yaml
