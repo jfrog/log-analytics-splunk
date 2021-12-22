@@ -12,10 +12,11 @@ artifactory:
           curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/Metrics_splunk/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
           cp {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf  {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/HEC_HOST/{{ .Values.splunk.host }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/HEC_PORT/{{ .Values.splunk.port }}/g' fluent.tmp.conf;
+          sed -i -e 's/HEC_PORT/{{ .Values.splunk.port }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/METRICS_HEC_TOKEN/{{ .Values.splunk.metrics_token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/HEC_TOKEN/{{ .Values.splunk.token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/COM_PROTOCOL/{{ .Values.splunk.com_protocol }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/INSECURE_SSL/{{ .Values.splunk.insecure_ssl }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/JPD_URL/{{ .Values.jfrog.observability.metrics.jpd_url }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/ADMIN_USERNAME/{{ .Values.jfrog.observability.metrics.username }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/API_KEY/{{ .Values.jfrog.observability.metrics.apikey }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
@@ -41,7 +42,8 @@ splunk:
   token: splunk_hec_token
   metrics_token: splunk_metrics_hec_token
   index: jfrog_splunk
-  com_protocol: http
+  com_protocol: https
+  insecure_ssl: false
 jfrog:
   observability:
     metrics:

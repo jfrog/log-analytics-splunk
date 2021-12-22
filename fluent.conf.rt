@@ -241,10 +241,10 @@
   index jfrog_splunk_metrics
   metric_name_key metric_name
   metric_value_key value
+  insecure_ssl INSECURE_SSL
   <fields>
   </fields>
 </match>
-
 
 <match jfrog.**>
   @type splunk_hec
@@ -258,6 +258,7 @@
   use_fluentd_time false
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl true
   # ssl parameter
   #use_ssl true
   #ca_file /path/to/ca.pem
