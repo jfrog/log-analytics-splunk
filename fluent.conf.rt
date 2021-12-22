@@ -258,7 +258,7 @@
   use_fluentd_time false
   # buffered output parameter
   flush_interval 10s
-  insecure_ssl true
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   #use_ssl true
   #ca_file /path/to/ca.pem
