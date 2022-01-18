@@ -141,64 +141,50 @@ Ensure you have access to the Internet from VM. Recommended install is through f
 
 | OS            | Package Manager | Link |
 |---------------|-----------------|------|
-| CentOS/RHEL   | RPM (YUM)       | https://docs.fluentd.org/installation/install-by-rpm |
-| Debian/Ubuntu | APT             | https://docs.fluentd.org/installation/install-by-deb |
-| MacOS/Darwin  | DMG             | https://docs.fluentd.org/installation/install-by-dmg |
-| Windows       | MSI             | https://docs.fluentd.org/installation/install-by-msi |
+| CentOS/RHEL   | Linux - RPM (YUM)       | https://docs.fluentd.org/installation/install-by-rpm |
+| Debian/Ubuntu | Linux - APT             | https://docs.fluentd.org/installation/install-by-deb |
+| MacOS/Darwin  | MacOS - DMG             | https://docs.fluentd.org/installation/install-by-dmg |
+| Windows       | Windows - MSI           | https://docs.fluentd.org/installation/install-by-msi |
+|Gem Install**	| MacOS & Linux - Gem			   | https://docs.fluentd.org/installation/install-by-gem | 
 
-User installs can utilize the zip installer for Linux
 
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+```text
+** For Gem Install Ruby Interpreter has to be setup first, following is the recommended process to install Ruby
 
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
+1. Install Ruby Version Manager (RVM) as described in https://rvm.io/rvm/install#installation-explained, ensure to follow all the onscreen instructions provided to complete the rvm installation
+	* For installation across users a SUDO based install is recommended, the installation is as described in https://rvm.io/support/troubleshooting#sudo
 
-````text
-cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
-````
+2. Once rvm installation is complete, verify the RVM installation executing the command 'rvm -v'
 
-Untar to create the folder:
-````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
+3. Now install ruby v2.7.0 or above executing the command 'rvm install <ver_num>', ex: 'rvm install 2.7.5'
 
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
+4. Verify the ruby installation, execute 'ruby -v', gem installation 'gem -v' and 'bundler -v' to ensure all the compoments are intact
 
-Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
+5. Post completion of Ruby, Gems installation, the environment is ready to further install new gems, execute the following gem install commands one after other to setup the needed ecosystem
 
-````text
-./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
-````
+	'gem install fluentd'
+
+```
+
+After FluentD is successfully installed, the below plungins are required to be installed
+
+```text
+
+	'gem install fluent-plugin-splunk-hec'
+	'gem install fluent-plugin-jfrog-siem'
+	'gem install fluent-plugin-jfrog-metrics'
+
+```
 
 ### Docker
 
-Recommended install for Docker is to utilize the zip installer for Linux
+```text
 
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+Docker installation is similar to the steps described as for a Virtual Machine (Linux Sections), ensure to have write permissions for the docker container user where the installation steps are  being executed. 
 
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
+```
 
-````text
-cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
-````
-
-Untar to create the folder:
-````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
-
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
+Install it to a directory where the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section. 
 
 Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
 
@@ -329,18 +315,20 @@ cd $JF_PRODUCT_DATA_INTERNAL
 wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt
 ````
 
-Override the match directive(last section) of the downloaded `fluent.conf.rt` with the details given below
+Override the match directive(jfrog.**) of the downloaded `fluent.conf.rt` with the details given below
 
 ```
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   use_ssl false
   ca_file /path/to/ca.pem
@@ -352,6 +340,33 @@ _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
 _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
+
+For open metrics data to be sent to splunk, override the match directive(jfrog.metrics.**) of the downloaded `fluent.conf.rt` with the details given below
+
+```
+<match jfrog.metrics.**>
+  @type splunk_hec
+  datatype metric
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token METRICS_HEC_TOKEN
+  index jfrog_splunk
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  insecure_ssl INSECURE_SSL
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
+```
+
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
+
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
+
+_**required**_: ```METRICS_HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
 If ssl is enabled, ca file will be used and must be supplied
 
@@ -386,7 +401,28 @@ _**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfr
 
 _**optional**_: If not specified, value is set to current date. Setting from_date value will result in violations from the specified date
 
-Override the match directive (last section) of the downloaded `fluent.conf.xray` with the details given below
+
+For open metrics data to be sent to splunk, Fill in the JPD_URL, USER, JFROG_API_KEY fields in the source directive of the downloaded `fluent.conf.xray` with the details given below for the source
+
+```text
+<source>
+  @type jfrog_metrics
+  @id metrics_http_jfrt
+  tag jfrog.metrics.artifactory
+  interval 5s
+  metric_prefix 'jfrog.artifactory'
+  jpd_url JPD_URL
+  username USER
+  apikey JFROG_API_KEY
+</source>
+```
+
+_**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<ip_address>` with is used to pull Xray Violations
+
+_**required**_: ```USER``` is the Artifactory username for authentication
+
+_**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
 
 ```
 <match jfrog.**>

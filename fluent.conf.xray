@@ -146,14 +146,43 @@
   remove_keys _impacted_artifacts_url_, _type_, _watch_name_, _violation_details_url_, _cvss_score_, _cvss_version_
 </filter>
 
+<source>
+  @type jfrog_metrics
+  @id metrics_http_jfrt
+  tag jfrog.metrics.xray
+  interval 5s
+  metric_prefix 'jfrog.xray'
+  jpd_url JPD_URL
+  username ADMIN_USERNAME
+  apikey API_KEY
+</source>
+
 ####################
 # SPLUNK OUTPUT
 ####################
+
+<match jfrog.metrics.**>
+  @type splunk_hec
+  protocol COM_PROTOCOL
+  data_type metric
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token METRICS_HEC_TOKEN
+  flush_interval 5s
+  source ${tag}
+  index jfrog_splunk_metrics
+  metric_name_key metric_name
+  metric_value_key value
+  insecure_ssl INSECURE_SSL
+  <fields>
+  </fields>
+</match>
+
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   sourcetype_key log_source

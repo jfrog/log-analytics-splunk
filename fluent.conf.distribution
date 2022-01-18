@@ -123,9 +123,9 @@
 ####################
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   sourcetype_key log_source

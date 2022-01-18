@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "2.0.0",
+  "info": {
+    "title": "JFrog Platform Log Analytics",
+    "id": {
+      "group": null,
+      "name": "jfrog-logs",
+      "version": "1.2.4"
+    },
+    "author": [
+      {
+        "name": "JFrog",
+        "email": null,
+        "company": null
+      }
+    ],
+    "releaseDate": null,
+    "description": "This app helps process extracted logs for the JFrog Platform, the universal, hybrid end-to-end DevOps platform.  The app includes a diagnostic dashboard view for JFrog Artifactory. For more information see our blog:  https://jfrog.com/blog/unified-jfrog-log-analytics-with-splunk/",
+    "classification": {
+      "intendedAudience": null,
+      "categories": [],
+      "developmentStatus": null
+    },
+    "commonInformationModels": null,
+    "license": {
+      "name": null,
+      "text": null,
+      "uri": null
+    },
+    "privacyPolicy": {
+      "name": null,
+      "text": null,
+      "uri": null
+    },
+    "releaseNotes": {
+      "name": null,
+      "text": "./README.md",
+      "uri": null
+    }
+  },
+  "dependencies": null,
+  "tasks": null,
+  "inputGroups": null,
+  "incompatibleApps": null,
+  "platformRequirements": null,
+  "supportedDeployments": [
+    "_standalone",
+    "_distributed"
+  ],
+  "targetWorkloads": null
+}
