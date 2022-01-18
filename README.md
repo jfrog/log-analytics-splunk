@@ -178,9 +178,22 @@ After FluentD is successfully installed, the below plungins are required to be i
 
 ### Docker
 
+In order to run fluentd as a docker image to send the log, siem and metrics data to splunk, the following commands needs to be executed on the host that runs the docker.
+
+1. Check the docker installation is functional, execute command 'docker version' and 'docker ps'
+
+2. Once the version and process are listed successfully, execute 'docker pull jfrog/fluentd-splunk'
+
+3. Download the ENV_CONF file needed to run Jfrog/FluentD Docker Images for the intended observability platform
+
 ```text
 
-Docker installation is similar to the steps described as for a Virtual Machine (Linux Sections), ensure to have write permissions for the docker container user where the installation steps are  being executed. 
+For Splunk as the observability platform, execute the command
+
+
+
+
+
 
 ```
 
