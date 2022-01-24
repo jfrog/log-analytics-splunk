@@ -149,7 +149,7 @@ Ensure you have access to the Internet from VM. Recommended install is through f
 
 
 ```text
-** For Gem Install Ruby Interpreter has to be setup first, following is the recommended process to install Ruby
+** For Gem based install, Ruby Interpreter has to be setup first, following is the recommended process to install Ruby
 
 1. Install Ruby Version Manager (RVM) as described in https://rvm.io/rvm/install#installation-explained, ensure to follow all the onscreen instructions provided to complete the rvm installation
 	* For installation across users a SUDO based install is recommended, the installation is as described in https://rvm.io/support/troubleshooting#sudo
@@ -176,34 +176,52 @@ After FluentD is successfully installed, the below plungins are required to be i
 
 ```
 
-### Docker
-
-In order to run fluentd as a docker image to send the log, siem and metrics data to splunk, the following commands needs to be executed on the host that runs the docker.
-
-1. Check the docker installation is functional, execute command 'docker version' and 'docker ps'
-
-2. Once the version and process are listed successfully, execute 'docker pull jfrog/fluentd-splunk'
-
-3. Download the ENV_CONF file needed to run Jfrog/FluentD Docker Images for the intended observability platform
-
-```text
-
-For Splunk as the observability platform, execute the command
-
-
-
-
-
-
-```
-
-Install it to a directory where the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section. 
 
 Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
 
 ````text
 ./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
 ````
+
+
+### Docker
+
+In order to run fluentd as a docker image to send the log, siem and metrics data to splunk, the following commands needs to be executed on the host that runs the docker.
+
+1. Check the docker installation is functional, execute command 'docker version' and 'docker ps'.
+
+2. Once the version and process are listed successfully, build the intended docker image for the observability platform using the docker file,
+
+	* Download Dockerfile from [here](https://raw.githubusercontent.com/jfrog/log-analytics/master/docker-build/Dockerfile) to any directory which has write permissions.
+
+3. Download the Dockerenvfile_<observability_platform>.txt file needed to run Jfrog/FluentD Docker Images for the intended observability platform,
+
+	* Download Dockerenvfile_splunk.txt from [here](https://raw.githubusercontent.com/jfrog/log-analytics/master/docker-build/Dockerenvfile_splunk.txt) to the dierectory where the docker file was downloaded.
+
+```text
+
+For Splunk as the observability platform, execute these commands to setup the docker container running the fluentd installation
+
+1. Execute 'docker build --build-arg SOURCE="JFRT" --build-arg TARGET="SPLUNK" -t <image_name> .'
+
+Command example
+
+'docker build --build-arg SOURCE="JFRT" --build-arg TARGET="SPLUNK" -t jfrog/fluentd-splunk-rt .'
+
+The above command will build the docker image.
+
+2. Fill the necessary information in the Dockerenvfile_splunk.txt file, if the value for any of the field requires to have a '/' use '\/' and if '\' is required use '\\'.
+
+3. Execute 'docker run -it --name jfrog-fluentd-splunk-rt -v <path_to_logs>:/var/opt/jfrog/artifactory --env-file Dockerenvfile_splunk.txt <image_name>' 
+
+The <path_to_logs> should be an absolute path where the Jfrog Artifactory Logs folder resides, i.e for an Docker based Artifactory Installation,  ex: /var/opt/jfrog/artifactory/var/logs on the docker host.
+
+Command example
+
+'docker run -it --name jfrog-fluentd-splunk-rt -v /var/opt/jfrog/artifactory/var:/var/opt/jfrog/artifactory --env-file Dockerenvfile_splunk.txt jfrog/fluentd-splunk-rt'
+
+
+```
 
 ### Kubernetes Deployment with Helm
 
@@ -328,7 +346,7 @@ cd $JF_PRODUCT_DATA_INTERNAL
 wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt
 ````
 
-Override the match directive(jfrog.**) of the downloaded `fluent.conf.rt` with the details given below
+For log analytics data to be sent to splunk, Override the match directive(jfrog.**) of the downloaded `fluent.conf.rt` with the details given below
 
 ```
 <match jfrog.**>
@@ -347,12 +365,6 @@ Override the match directive(jfrog.**) of the downloaded `fluent.conf.rt` with t
   ca_file /path/to/ca.pem
 </match>
 ```
-
-_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
-
-_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
-
-_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
 For open metrics data to be sent to splunk, override the match directive(jfrog.metrics.**) of the downloaded `fluent.conf.rt` with the details given below
 
@@ -375,13 +387,39 @@ For open metrics data to be sent to splunk, override the match directive(jfrog.m
 </match>
 ```
 
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
+
 _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
 _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
-_**required**_: ```METRICS_HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-If ssl is enabled, ca file will be used and must be supplied
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
+
+For open metrics data to be sent to splunk, supply JFrog JPD access params mentioned in the source directive(jfrog_metrics) of the downloaded `fluent.conf.rt`
+
+```
+
+<source>
+  @type jfrog_metrics
+  @id metrics_http_jfrt
+  tag jfrog.metrics.artifactory
+  interval 5s
+  metric_prefix 'jfrog.artifactory'
+  jpd_url JPD_URL
+  username USERNAME
+  apikey API_KEY
+</source>
+```
+_**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<ip_address>`
+
+_**required**_: ```USERNAME``` is the Artifactory username for authentication
+
+_**required**_: ```API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
+
 
 ### Configuration steps for Xray
 
@@ -421,11 +459,11 @@ For open metrics data to be sent to splunk, Fill in the JPD_URL, USER, JFROG_API
 <source>
   @type jfrog_metrics
   @id metrics_http_jfrt
-  tag jfrog.metrics.artifactory
+  tag jfrog.metrics.xray
   interval 5s
-  metric_prefix 'jfrog.artifactory'
+  metric_prefix 'jfrog.xray'
   jpd_url JPD_URL
-  username USER
+  username USERNAME
   apikey JFROG_API_KEY
 </source>
 ```
