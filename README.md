@@ -23,7 +23,6 @@
     * [OS / Virtual Machine](#os--virtual-machine)
     * [Docker](#docker)
     * [Kubernetes Deployment with Helm](#kubernetes-deployment-with-helm)
-    * [Kubernetes Deployment without Helm](#kubernetes-deployment-without-helm)
 4. [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk)
     * [Configuration steps for Artifactory](#configuration-steps-for-artifactory)
     * [Configuration steps for Xray](#configuration-steps-for-xray)
@@ -42,7 +41,7 @@ Install the `JFrog Log Analytics Platform` app from Splunkbase [here!](https://s
 
 ````text
 1. Download file from Splunkbase
-2. Open Splunk web console as adminstrator
+2. Open Splunk web console as administrator
 3. From homepage click on settings wheel in top right of Apps section
 4. Click on "Install app from file"
 5. Select download file from Splunkbase on your computer
@@ -70,7 +69,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 
 #### Create index jfrog_splunk
 ````text
-1. Open Splunk web console as adminstrator
+1. Open Splunk web console as administrator
 2. Click on "Settings" in dropdown select "Indexes"
 3. Click on "New Index"
 4. Enter Index name as jfrog_splunk
@@ -79,7 +78,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 
 #### Configure new HEC token to receive Logs
 ````text
-1. Open Splunk web console as adminstrator
+1. Open Splunk web console as administrator
 2. Click on "Settings" in dropdown select "Data inputs"
 3. Click on "HTTP Event Collector"
 4. Click on "New Token"
@@ -95,7 +94,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 
 ## Environment Configuration
 
-We rely heavily on environment variables so that the correct log files are streamed to your observalibity dashboards. Ensure that you set the JF_PRODUCT_DATA_INTERNAL environment variable to the correct path for your product
+We rely heavily on environment variables so that the correct log files are streamed to your observability dashboards. Ensure that you set the JF_PRODUCT_DATA_INTERNAL environment variable to the correct path for your product
 
 The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location.
 
@@ -119,7 +118,7 @@ export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/nginx/
 ````
 
 ````text
-Mision Control:
+Mission Control:
 export JF_PRODUCT_DATA_INTERNAL=/var/opt/jfrog/mc/
 ````
 
@@ -139,82 +138,99 @@ export JF_PRODUCT_DATA_INTERNAL=/opt/jfrog/pipelines/var/
 
 Ensure you have access to the Internet from VM. Recommended install is through fluentd's native OS based package installs:
 
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| CentOS/RHEL   | RPM (YUM)       | https://docs.fluentd.org/installation/install-by-rpm |
-| Debian/Ubuntu | APT             | https://docs.fluentd.org/installation/install-by-deb |
-| MacOS/Darwin  | DMG             | https://docs.fluentd.org/installation/install-by-dmg |
-| Windows       | MSI             | https://docs.fluentd.org/installation/install-by-msi |
+| OS             | Package Manager        | Link                                                 |
+|----------------|------------------------|------------------------------------------------------|
+| CentOS/RHEL    | Linux - RPM (YUM)      | https://docs.fluentd.org/installation/install-by-rpm |
+| Debian/Ubuntu  | Linux - APT            | https://docs.fluentd.org/installation/install-by-deb |
+| MacOS/Darwin   | MacOS - DMG            | https://docs.fluentd.org/installation/install-by-dmg |
+| Windows        | Windows - MSI          | https://docs.fluentd.org/installation/install-by-msi |
+| Gem Install**	 | MacOS & Linux - Gem			 | https://docs.fluentd.org/installation/install-by-gem | 
 
-User installs can utilize the zip installer for Linux
 
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+```text
+** For Gem based install, Ruby Interpreter has to be setup first, following is the recommended process to install Ruby
 
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
+1. Install Ruby Version Manager (RVM) as described in https://rvm.io/rvm/install#installation-explained, ensure to follow all the onscreen instructions provided to complete the rvm installation
+	* For installation across users a SUDO based install is recommended, the installation is as described in https://rvm.io/support/troubleshooting#sudo
 
-````text
-cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
-````
+2. Once rvm installation is complete, verify the RVM installation executing the command 'rvm -v'
 
-Untar to create the folder:
-````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
+3. Now install ruby v2.7.0 or above executing the command 'rvm install <ver_num>', ex: 'rvm install 2.7.5'
 
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
+4. Verify the ruby installation, execute 'ruby -v', gem installation 'gem -v' and 'bundler -v' to ensure all the components are intact
+
+5. Post completion of Ruby, Gems installation, the environment is ready to further install new gems, execute the following gem install commands one after other to setup the needed ecosystem
+
+	'gem install fluentd'
+
+```
+
+After FluentD is successfully installed, the below plugins are required to be installed
+
+```text
+
+	'gem install fluent-plugin-splunk-hec'
+	'gem install fluent-plugin-jfrog-siem'
+	'gem install fluent-plugin-jfrog-metrics'
+
+```
+
 
 Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
 
 ````text
 ./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
 ````
+
 
 ### Docker
 
-Recommended install for Docker is to utilize the zip installer for Linux
+In order to run fluentd as a docker image to send the log, siem and metrics data to splunk, the following commands needs to be executed on the host that runs the docker.
 
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
+1. Check the docker installation is functional, execute command 'docker version' and 'docker ps'.
 
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
+2. Once the version and process are listed successfully, build the intended docker image for the observability platform using the docker file,
 
-````text
-cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
-````
+	* Download Dockerfile from [here](https://raw.githubusercontent.com/jfrog/log-analytics/master/docker-build/Dockerfile) to any directory which has write permissions.
 
-Untar to create the folder:
-````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
+3. Download the Dockerenvfile_<observability_platform>.txt file needed to run Jfrog/FluentD Docker Images for the intended observability platform,
 
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
+	* Download Dockerenvfile_splunk.txt from [here](https://raw.githubusercontent.com/jfrog/log-analytics/master/docker-build/Dockerenvfile_splunk.txt) to the directory where the docker file was downloaded.
 
-Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
+```text
 
-````text
-./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
-````
+For Splunk as the observability platform, execute these commands to setup the docker container running the fluentd installation
+
+1. Execute 'docker build --build-arg SOURCE="JFRT" --build-arg TARGET="SPLUNK" -t <image_name> .'
+
+Command example
+
+'docker build --build-arg SOURCE="JFRT" --build-arg TARGET="SPLUNK" -t jfrog/fluentd-splunk-rt .'
+
+The above command will build the docker image.
+
+2. Fill the necessary information in the Dockerenvfile_splunk.txt file, if the value for any of the field requires to have a '/' use '\/' and if '\' is required use '\\'.
+
+3. Execute 'docker run -it --name jfrog-fluentd-splunk-rt -v <path_to_logs>:/var/opt/jfrog/artifactory --env-file Dockerenvfile_splunk.txt <image_name>' 
+
+The <path_to_logs> should be an absolute path where the Jfrog Artifactory Logs folder resides, i.e for an Docker based Artifactory Installation,  ex: /var/opt/jfrog/artifactory/var/logs on the docker host.
+
+Command example
+
+'docker run -it --name jfrog-fluentd-splunk-rt -v /var/opt/jfrog/artifactory/var:/var/opt/jfrog/artifactory --env-file Dockerenvfile_splunk.txt jfrog/fluentd-splunk-rt'
+
+
+```
 
 ### Kubernetes Deployment with Helm
 
 Recommended installation for Kubernetes is to utilize the helm chart with the associated values.yaml in this repo.
 
-| Product | Example Values File |
-|---------|-------------|
-| Artifactory | helm/artifactory-values.yaml |
+| Product        | Example Values File             |
+|----------------|---------------------------------|
+| Artifactory    | helm/artifactory-values.yaml    |
 | Artifactory HA | helm/artifactory-ha-values.yaml |
-| Xray | helm/xray-values.yaml |
+| Xray           | helm/xray-values.yaml           |
 
 Update the values.yaml associated to the product you want to deploy with your Splunk settings.
 
@@ -286,36 +302,6 @@ helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=http://my-artifactory
        -f helm/xray-values.yaml
 ```
 
-### Kubernetes Deployment without Helm
-
-To modify existing Kubernetes based deployments without using Helm, users can use the zip installer for Linux:
-
-| OS            | Package Manager | Link |
-|---------------|-----------------|------|
-| Linux (x86_64)| ZIP             | https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz |
-
-Download it to a directory the user has permissions to write such as the `$JF_PRODUCT_DATA_INTERNAL` locations discussed above in the [Environment Configuration](#environment-configuration) section.
-
-````text
-cd $JF_PRODUCT_DATA_INTERNAL
-wget https://github.com/jfrog/log-analytics/raw/master/fluentd-installer/fluentd-1.11.0-linux-x86_64.tar.gz
-````
-
-Untar to create the folder:
-````text
-tar -xvf fluentd-1.11.0-linux-x86_64.tar.gz
-````
-Move into the new folder:
-
-````text
-cd fluentd-1.11.0-linux-x86_64
-````
-Configure `fluent.conf.*` according to the instructions mentioned in [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
-
-````text
-./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
-````
-
 ## Fluentd Configuration for Splunk
 
 Download and configure the relevant fluentd.conf files for Splunk
@@ -329,23 +315,48 @@ cd $JF_PRODUCT_DATA_INTERNAL
 wget https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt
 ````
 
-Override the match directive(last section) of the downloaded `fluent.conf.rt` with the details given below
+For log analytics data to be sent to splunk, Override the match directive(jfrog.**) of the downloaded `fluent.conf.rt` with the details given below
 
 ```
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   use_ssl false
   ca_file /path/to/ca.pem
 </match>
 ```
+
+For open metrics data to be sent to splunk, override the match directive(jfrog.metrics.**) of the downloaded `fluent.conf.rt` with the details given below
+
+```
+<match jfrog.metrics.**>
+  @type splunk_hec
+  datatype metric
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token METRICS_HEC_TOKEN
+  index jfrog_splunk
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  insecure_ssl INSECURE_SSL
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
+```
+
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
 
 _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
@@ -353,7 +364,31 @@ _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
 _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-If ssl is enabled, ca file will be used and must be supplied
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
+
+For open metrics data to be sent to splunk, supply JFrog JPD access params mentioned in the source directive(jfrog_metrics) of the downloaded `fluent.conf.rt`
+
+```
+
+<source>
+  @type jfrog_metrics
+  @id metrics_http_jfrt
+  tag jfrog.metrics.artifactory
+  interval 5s
+  metric_prefix 'jfrog.artifactory'
+  jpd_url JPD_URL
+  username USERNAME
+  apikey API_KEY
+</source>
+```
+_**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<ip_address>`
+
+_**required**_: ```USERNAME``` is the Artifactory username for authentication
+
+_**required**_: ```API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
+
 
 ### Configuration steps for Xray
 
@@ -386,23 +421,48 @@ _**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfr
 
 _**optional**_: If not specified, value is set to current date. Setting from_date value will result in violations from the specified date
 
-Override the match directive (last section) of the downloaded `fluent.conf.xray` with the details given below
+
+For open metrics data to be sent to splunk, Fill in the JPD_URL, USER, JFROG_API_KEY fields in the source directive of the downloaded `fluent.conf.xray` with the details given below for the source
+
+```text
+<source>
+  @type jfrog_metrics
+  @id metrics_http_jfrt
+  tag jfrog.metrics.xray
+  interval 5s
+  metric_prefix 'jfrog.xray'
+  jpd_url JPD_URL
+  username USERNAME
+  apikey JFROG_API_KEY
+</source>
+```
+
+_**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<ip_address>` with is used to pull Xray Violations
+
+_**required**_: ```USER``` is the Artifactory username for authentication
+
+_**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
 
 ```
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   use_ssl false
   ca_file /path/to/ca.pem
 </match>
 ```
+
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
 
 _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
@@ -410,7 +470,8 @@ _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
 _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-If ssl is enabled, ca file will be used and must be supplied
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
 
 ### Configuration steps for Nginx
 
@@ -426,18 +487,22 @@ Override the match directive(last section) of the downloaded `fluent.conf.nginx`
 ```
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   use_ssl false
   ca_file /path/to/ca.pem
 </match>
 ```
+
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
 
 _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
@@ -445,7 +510,8 @@ _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
 _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-If ssl is enabled, ca file will be used and must be supplied
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
 
 ### Configuration steps for Mission Control
 
@@ -461,18 +527,22 @@ Override the match directive(last section) of the downloaded `fluent.conf.missio
 ```
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   use_ssl false
   ca_file /path/to/ca.pem
 </match>
 ```
+
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
 
 _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
@@ -480,7 +550,8 @@ _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
 _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-If ssl is enabled, ca file will be used and must be supplied
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
 
 ### Configuration steps for Distribution
 
@@ -496,18 +567,22 @@ Override the match directive(last section) of the downloaded `fluent.conf.distri
 ```
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   use_ssl false
   ca_file /path/to/ca.pem
 </match>
 ```
+
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
 
 _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
@@ -515,7 +590,8 @@ _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
 _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-If ssl is enabled, ca file will be used and must be supplied
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
 
 ### Configuration steps for Pipelines
 
@@ -531,18 +607,22 @@ Override the match directive(last section) of the downloaded `fluent.conf.pipeli
 ```
 <match jfrog.**>
   @type splunk_hec
-  host HEC_HOST
-  port HEC_PORT
-  token HEC_TOKEN
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token HEC_TOKEN
   index jfrog_splunk
   format json
   # buffered output parameter
   flush_interval 10s
+  insecure_ssl INSECURE_SSL
   # ssl parameter
   use_ssl false
   ca_file /path/to/ca.pem
 </match>
 ```
+
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
 
 _**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
 
@@ -550,7 +630,8 @@ _**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
 
 _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
 
-If ssl is enabled, ca file will be used and must be supplied
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
 
 ## Dashboards
 

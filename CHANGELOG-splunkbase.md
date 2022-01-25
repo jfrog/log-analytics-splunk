@@ -1,3 +1,7 @@
+## [1.2.4] - Jan 17, 2022
+* Added Support for Openmetrics Dashboards for Jfrog Artifactory and Jfrog Xray
+* To enable and setup Openmentrics follow - https://github.com/jfrog/log-analytics-splunk/tree/Metrics_splunk#readme
+
 ## [1.2.3] - Aug 26, 2021
 * Updating jQuery version to 3.5.0 or higher
 
