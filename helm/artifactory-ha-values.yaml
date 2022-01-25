@@ -9,7 +9,7 @@ artifactory:
         - '-c'
         - >
           mkdir -p {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/;
-          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/Metrics_splunk/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
           cp {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf  {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/HEC_HOST/{{ .Values.splunk.host }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/HEC_PORT/{{ .Values.splunk.port }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
