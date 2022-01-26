@@ -21,25 +21,25 @@ common:
         - 'sh'
         - '-c'
         - >
-          mkdir -p {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/;
-          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
-          cp {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf  {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/HEC_HOST/{{ .Values.splunk.host }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/HEC_PORT/{{ .Values.splunk.port }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/HEC_TOKEN/{{ .Values.splunk.token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/METRICS_HEC_TOKEN/{{ .Values.splunk.metrics_token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/COM_PROTOCOL/{{ .Values.splunk.com_protocol }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/INSECURE_SSL/{{ .Values.splunk.insecure_ssl }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/JPD_URL/{{ .Values.jfrog.observability.metrics.jpd_url }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/ADMIN_USERNAME/{{ .Values.jfrog.observability.metrics.username }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/JFROG_API_KEY/{{ .Values.jfrog.observability.metrics.apikey }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          mkdir -p {{ .Values.xray.persistence.mountPath }}/etc/fluentd/;
+          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/Metrics_values_sed/fluent.conf.xray -o {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          cp {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf  {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/HEC_HOST/{{ .Values.splunk.host }}/g' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/HEC_PORT/{{ .Values.splunk.port }}/g' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/METRICS_HEC_TOKEN/{{ .Values.splunk.metrics_token }}/' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/HEC_TOKEN/{{ .Values.splunk.token }}/' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/COM_PROTOCOL/{{ .Values.splunk.com_protocol }}/g' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/INSECURE_SSL/{{ .Values.splunk.insecure_ssl }}/g' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's|JPD_URL|{{ .Values.jfrog.observability.jpd_url }}|g' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/ADMIN_USERNAME/{{ .Values.jfrog.observability.username }}/' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/JFROG_API_KEY/{{ .Values.jfrog.observability.apikey }}/' {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          mv {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf;
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
           name: data-volume
   customSidecarContainers: |
     - name: "xray-platform-fluentd-sidecar"
-      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.15.0"
+      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.16.0"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
@@ -59,10 +59,6 @@ splunk:
   insecure_ssl: false
 jfrog:
   observability:
-    siem:
-      username: jfrog_user
-      apikey: jfrog_api_key
-    metrics:
-      jpd_url: jpd_url
-      username: jfrog_user
-      apikey: jfrog_api_key
+    jpd_url: jpd_url
+    username: jfrog_user
+    apikey: jfrog_api_key
