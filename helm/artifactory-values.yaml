@@ -26,7 +26,7 @@ artifactory:
           name: artifactory-volume
   customSidecarContainers: |
     - name: "artifactory-fluentd-sidecar"
-      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.15.0"
+      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.16.0"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
