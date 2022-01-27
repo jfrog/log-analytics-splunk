@@ -9,7 +9,7 @@ artifactory:
         - '-c'
         - >
           mkdir -p {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/;
-          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/Metrics_splunk/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
           cp {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf  {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/HEC_HOST/{{ .Values.splunk.host }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/HEC_PORT/{{ .Values.splunk.port }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
@@ -17,7 +17,7 @@ artifactory:
           sed -i -e 's/HEC_TOKEN/{{ .Values.splunk.token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/COM_PROTOCOL/{{ .Values.splunk.com_protocol }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/INSECURE_SSL/{{ .Values.splunk.insecure_ssl }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/JPD_URL/{{ .Values.jfrog.observability.metrics.jpd_url }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's|JPD_URL|{{ .Values.jfrog.observability.metrics.jpd_url }}|g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/ADMIN_USERNAME/{{ .Values.jfrog.observability.metrics.username }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/API_KEY/{{ .Values.jfrog.observability.metrics.apikey }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
@@ -26,7 +26,7 @@ artifactory:
           name: volume
   customSidecarContainers: |
     - name: "artifactory-fluentd-sidecar"
-      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.14.0"
+      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.16.0"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
