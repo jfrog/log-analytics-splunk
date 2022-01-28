@@ -345,7 +345,7 @@ For open metrics data to be sent to splunk, override the match directive(jfrog.m
   hec_host HEC_HOST
   hec_port HEC_PORT
   hec_token METRICS_HEC_TOKEN
-  index jfrog_splunk
+  index jfrog_splunk_metrics
   format json
   # buffered output parameter
   flush_interval 10s
@@ -366,8 +366,6 @@ _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new
 
 _**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
 else set this to 'true' to bypass SSL certificate verification.
-
-For open metrics data to be sent to splunk, supply JFrog JPD access params mentioned in the source directive(jfrog_metrics) of the downloaded `fluent.conf.rt`
 
 ```
 
@@ -472,6 +470,40 @@ _**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new
 
 _**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
 else set this to 'true' to bypass SSL certificate verification.
+
+For open metrics data to be sent to splunk, override the match directive(jfrog.metrics.**) of the downloaded `fluent.conf.xray` with the details given below
+
+```
+<match jfrog.metrics.**>
+  @type splunk_hec
+  datatype metric
+  protocol COM_PROTOCOL
+  hec_host HEC_HOST
+  hec_port HEC_PORT
+  hec_token METRICS_HEC_TOKEN
+  index jfrog_splunk_metrics
+  format json
+  # buffered output parameter
+  flush_interval 10s
+  insecure_ssl INSECURE_SSL
+  # ssl parameter
+  use_ssl false
+  ca_file /path/to/ca.pem
+</match>
+```
+
+_**required**_: ```COM_PROTOCOL``` will be either 'http' or 'https' based on Splunk Server URL
+
+_**required**_: ```HEC_HOST``` is the IP address or DNS of Splunk HEC
+
+_**required**_: ```HEC_PORT``` is the Splunk HEC port which by default is 8088
+
+_**required**_: ```HEC_TOKEN``` is the saved generated token from [Configure new HEC token to receive Logs](#configure-new-hec-token-to-receive-logs)
+
+_**required**_: ```INSECURE_SSL```if set to 'false' Splunk Host Server SSL Certificate is required, fill the ca_file path, if ssl is enabled, ca file will be used and must be supplied,
+else set this to 'true' to bypass SSL certificate verification.
+
+```
 
 ### Configuration steps for Nginx
 
