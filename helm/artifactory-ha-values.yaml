@@ -20,6 +20,8 @@ artifactory:
           sed -i -e 's/JPD_URL/{{ .Values.jfrog.observability.metrics.jpd_url }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/ADMIN_USERNAME/{{ .Values.jfrog.observability.metrics.username }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           sed -i -e 's/API_KEY/{{ .Values.jfrog.observability.metrics.apikey }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/JFROG_ADMIN_TOKEN/{{ .Values.jfrog.observability.metrics.token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
+          sed -i -e 's/COMMON_JPD/{{ .Values.jfrog.observability.metrics.common_jpd }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
           mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
@@ -50,3 +52,5 @@ jfrog:
       jpd_url: jpd_url
       username: jfrog_user
       apikey: jfrog_api_key
+      token: jfrog_admin_token
+      common_jpd: false

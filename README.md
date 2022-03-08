@@ -378,6 +378,8 @@ else set this to 'true' to bypass SSL certificate verification.
   jpd_url JPD_URL
   username USERNAME
   apikey API_KEY
+  token JFROG_ADMIN_TOKEN
+  common_jpd false
 </source>
 ```
 _**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<ip_address>`
@@ -386,7 +388,17 @@ _**required**_: ```USERNAME``` is the Artifactory username for authentication
 
 _**required**_: ```API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
 
+_**required**_: ```JFROG_ADMIN_TOKEN``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
 
+## Note
+
+* For Artifactory v7.4 and below only API Key must be used,
+* For Artifactory v7.4 to 7.29 either Token or API Key can be used,
+* For Artifactory v7.30 and above token only must be used. 
+
+* common_jpd: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray
+
+	* ex: https://sample_base_url/artifactory or https://sample_base_url/xray 
 
 ### Configuration steps for Xray
 
@@ -432,6 +444,8 @@ For open metrics data to be sent to splunk, Fill in the JPD_URL, USER, JFROG_API
   jpd_url JPD_URL
   username USERNAME
   apikey JFROG_API_KEY
+  token JFROG_ADMIN_TOKEN
+  common_jpd false
 </source>
 ```
 
@@ -440,6 +454,18 @@ _**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<
 _**required**_: ```USER``` is the Artifactory username for authentication
 
 _**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
+_**required**_: ```JFROG_ADMIN_TOKEN``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
+## Note
+
+* For Artifactory v7.4 and below only API Key must be used,
+* For Artifactory v7.4 to 7.29 either Token or API Key can be used,
+* For Artifactory v7.30 and above token only must be used. 
+
+* common_jpd: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray
+
+	* ex: https://sample_base_url/artifactory or https://sample_base_url/xray 
 
 
 ```

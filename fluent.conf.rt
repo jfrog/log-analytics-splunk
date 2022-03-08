@@ -223,6 +223,8 @@
   jpd_url JPD_URL
   username ADMIN_USERNAME
   apikey API_KEY
+  token JFROG_ADMIN_TOKEN
+  common_jpd COMMON_JPD
 </source>
 
 ####################
