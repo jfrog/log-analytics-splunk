@@ -1,6 +1,9 @@
 # JFrog Log Analytics Changelog
 All changes to the log analytics integration will be documented in this file.
 
+## [0.13.0] - Feb 14, 2022
+* Added call home implementation to the artifactory fluent configuration
+
 ## [0.12.0] - May 26, 2021
 ### Breaking Changes
 * Using unified fluentd configuration for Xray Logs and Violations dashboards

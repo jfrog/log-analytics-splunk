@@ -225,6 +225,40 @@
   apikey API_KEY
 </source>
 
+## CALL HOME
+<source>
+  @type exec
+  tag jfrog.callhome
+  command "curl --request GET 'http://localhost:8081/artifactory/api/system/version' -H 'Authorization: Bearer <TOKEN>'"
+  run_interval 1d
+  <parse>
+    @type json
+  </parse>
+</source>
+<filter jfrog.callhome>
+  @type record_transformer
+  renew_record true
+  keep_keys 'productId,features'
+  enable_ruby true
+  <record>
+    productId 'jfrogLogAnalyticsSplunk/0.13.0'
+    features ${return([{"featureId" => "ArtifactoryVersion/" + record["version"]}])}
+  </record>
+</filter>
+<match jfrog.callhome>
+  @type http
+  endpoint http://localhost:8081/artifactory/api/system/usage
+  open_timeout 5
+  content_type application/json
+  headers {"Authorization":"Bearer <TOKEN>"}
+  <format>
+    @type json
+  </format>
+  <buffer>
+    flush_interval 5s
+  </buffer>
+</match>
+
 ####################
 # SPLUNK OUTPUT
 ####################
