@@ -182,6 +182,7 @@
 
 <match jfrog.**>
   @type splunk_hec
+  protocol COM_PROTOCOL
   hec_host HEC_HOST
   hec_port HEC_PORT
   hec_token HEC_TOKEN
