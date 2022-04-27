@@ -1,0 +1,96 @@
+global:
+  splunk:
+    host: splunk.example.com
+    port: 8088
+    token: splunk_hec_token
+    metrics_token: splunk_metrics_hec_token
+    index: jfrog_splunk
+    com_protocol: https
+    insecure_ssl: false
+  jfrog:
+    observability:
+      metrics:
+        jpd_url: http://localhost:8082
+        jpd_url_nginx: http://jfrog-platform-artifactory-nginx
+        username: jfrog_user
+        apikey: jfrog_api_key
+        token: jfrog_token
+      branch: master
+
+installerInfo: '{ "productId": "Helm_elastic_artifactory/{{ .Chart.Version }}", "features": [ { "featureId": "ArtifactoryVersion/{{ default .Chart.AppVersion .Values.artifactory.image.version }}" }, { "featureId": "{{ if .Values.postgresql.enabled }}postgresql{{ else }}{{ .Values.database.type }}{{ end }}/0.0.0" }, { "featureId": "Platform/{{ default "kubernetes" .Values.installer.platform }}" },  { "featureId": "Channel/Helm_elastic_artifactory" } ] }'
+artifactory:
+  artifactory:
+    openMetrics:
+      enabled: true
+    customSidecarContainers: |
+      - name: "artifactory-fluentd-sidecar"
+        image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.18.0"
+        imagePullPolicy: "IfNotPresent"
+        command:
+          - 'sh'
+          - '-c'
+          - >
+            curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/{{ .Values.global.jfrog.observability.branch }}/fluent.conf.rt -o fluentd.conf;
+            cp fluentd.conf fluent.tmp.conf;
+            sed -i -e 's/HEC_HOST/{{ .Values.global.splunk.host }}/g' \
+              -e 's/HEC_PORT/{{ .Values.global.splunk.port }}/g' \
+              -e 's/METRICS_HEC_TOKEN/{{ .Values.global.splunk.metrics_token }}/' \
+              -e 's/HEC_TOKEN/{{ .Values.global.splunk.token }}/' \
+              -e 's/COM_PROTOCOL/{{ .Values.global.splunk.com_protocol }}/g' \
+              -e 's/INSECURE_SSL/{{ .Values.global.splunk.insecure_ssl }}/g' \
+              -e 's|JPD_URL|{{ .Values.global.jfrog.observability.metrics.jpd_url }}|g' \
+              -e 's/ADMIN_USERNAME/{{ .Values.global.jfrog.observability.metrics.username }}/' \
+              -e 's/JFROG_ADMIN_TOKEN/{{ .Values.global.jfrog.observability.metrics.token }}/' \
+              -e 's/COMMON_JPD/false/' \
+              -e 's/API_KEY/{{ .Values.global.jfrog.observability.metrics.apikey }}/' fluent.tmp.conf;
+            mv fluent.tmp.conf fluentd.conf;
+            fluentd -v -c fluentd.conf
+        volumeMounts:
+          - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
+            name: artifactory-volume
+        env:
+          - name: JF_PRODUCT_DATA_INTERNAL
+            value: {{ .Values.artifactory.persistence.mountPath }}
+xray:
+  enabled: true
+  common:
+    customSidecarContainers: |
+      - name: "xray-fluentd-sidecar"
+        image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.18.0"
+        imagePullPolicy: "IfNotPresent"
+        command:
+          - 'sh'
+          - '-c'
+          - >
+            curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/{{ .Values.global.jfrog.observability.branch }}/fluent.conf.xray -o fluentd.conf;
+            cp fluentd.conf fluent.tmp.conf;
+            sed -i -e 's/HEC_HOST/{{ .Values.global.splunk.host }}/g' \
+              -e 's/HEC_PORT/{{ .Values.global.splunk.port }}/g' \
+              -e 's/METRICS_HEC_TOKEN/{{ .Values.global.splunk.metrics_token }}/' \
+              -e 's/HEC_TOKEN/{{ .Values.global.splunk.token }}/' \
+              -e 's/COM_PROTOCOL/{{ .Values.global.splunk.com_protocol }}/g' \
+              -e 's/INSECURE_SSL/{{ .Values.global.splunk.insecure_ssl }}/g' \
+              -e 's|JPD_URL|{{ .Values.global.jfrog.observability.metrics.jpd_url }}|g' \
+              -e 's/ADMIN_USERNAME/{{ .Values.global.jfrog.observability.metrics.username }}/' \
+              -e 's/JFROG_ADMIN_TOKEN/{{ .Values.global.jfrog.observability.metrics.token }}/' \
+              -e 's/COMMON_JPD/false/' \
+              -e 's/JFROG_API_KEY/{{ .Values.global.jfrog.observability.metrics.apikey }}/' fluent.tmp.conf;  
+            [ `hostname` = "jfrog-platform-xray-0" ] && sed -i -e 's/jfrog_siem/sample/g' fluent.tmp.conf;
+            mv fluent.tmp.conf fluentd.conf;
+            fluentd -v -c fluentd.conf
+        volumeMounts:
+          - mountPath: "{{ .Values.xray.persistence.mountPath }}"
+            name: data-volume
+        env:
+        - name: JF_PRODUCT_DATA_INTERNAL
+          value: {{ .Values.xray.persistence.mountPath }}
+insight:
+  enabled: false
+distribution:
+  enabled: false
+pipelines:
+  enabled: false
+rabbitmq:
+  enabled: true
+redis:
+  enabled: false

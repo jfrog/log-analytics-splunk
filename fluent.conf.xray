@@ -193,5 +193,6 @@
   flush_interval 10s
   # ssl parameter
   #use_ssl true
+  insecure_ssl INSECURE_SSL
   #ca_file /path/to/ca.pem
 </match>
