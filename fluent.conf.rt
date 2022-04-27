@@ -231,6 +231,40 @@
   common_jpd COMMON_JPD
 </source>
 
+## CALL HOME
+<source>
+  @type exec
+  tag jfrog.callhome
+  command "curl --request GET 'JPD_URL/artifactory/api/system/version' -H 'Authorization: Bearer JFROG_ADMIN_TOKEN'"
+  run_interval 1d
+  <parse>
+    @type json
+  </parse>
+</source>
+<filter jfrog.callhome>
+  @type record_transformer
+  renew_record true
+  keep_keys 'productId,features'
+  enable_ruby true
+  <record>
+    productId 'jfrogLogAnalyticsSplunk/0.13.0'
+    features ${return([{"featureId" => "ArtifactoryVersion/" + record["version"]}])}
+  </record>
+</filter>
+<match jfrog.callhome>
+  @type http
+  endpoint JPD_URL/artifactory/api/system/usage
+  open_timeout 5
+  content_type application/json
+  headers {"Authorization":"Bearer JFROG_ADMIN_TOKEN"}
+  <format>
+    @type json
+  </format>
+  <buffer>
+    flush_interval 5s
+  </buffer>
+</match>
+
 ####################
 # SPLUNK OUTPUT
 ####################

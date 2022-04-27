@@ -119,6 +119,7 @@
   jpd_url JPD_URL
   username ADMIN_USERNAME
   apikey JFROG_API_KEY
+  token JFROG_ADMIN_TOKEN
   pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
 </source>
 <filter jfrog.xray.siem.*>
