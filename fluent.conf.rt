@@ -65,6 +65,7 @@
       time_key timestamp
       time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
+  emit_invalid_record_to_error false
 </filter>
 <source>
   @type tail
@@ -112,6 +113,7 @@
     time_key timestamp
     time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
+  emit_invalid_record_to_error false
 </filter>
 <source>
   @type tail
@@ -132,6 +134,7 @@
     time_key timestamp
     time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
+  emit_invalid_record_to_error false
 </filter>
 <source>
   @type tail
@@ -152,6 +155,7 @@
     time_key timestamp
     time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
+  emit_invalid_record_to_error false
 </filter>
 <filter jfrog.rt.artifactory.request>
   @type record_transformer
@@ -223,13 +227,15 @@
   jpd_url JPD_URL
   username ADMIN_USERNAME
   apikey API_KEY
+  token JFROG_ADMIN_TOKEN
+  common_jpd COMMON_JPD
 </source>
 
 ## CALL HOME
 <source>
   @type exec
   tag jfrog.callhome
-  command "curl --request GET 'http://localhost:8081/artifactory/api/system/version' -H 'Authorization: Bearer <TOKEN>'"
+  command "curl --request GET 'JPD_URL/artifactory/api/system/version' -H 'Authorization: Bearer JFROG_ADMIN_TOKEN'"
   run_interval 1d
   <parse>
     @type json
@@ -247,10 +253,10 @@
 </filter>
 <match jfrog.callhome>
   @type http
-  endpoint http://localhost:8081/artifactory/api/system/usage
+  endpoint JPD_URL/artifactory/api/system/usage
   open_timeout 5
   content_type application/json
-  headers {"Authorization":"Bearer <TOKEN>"}
+  headers {"Authorization":"Bearer JFROG_ADMIN_TOKEN"}
   <format>
     @type json
   </format>

@@ -112,7 +112,7 @@
       <single>
         <title>Watches</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ | stats dc(signature) as watches</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities")  | stats dc(signature) as watches</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -127,7 +127,7 @@
       <single>
         <title>Vulnerabilities</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ category="Security" | stats count as Vulnerabilities</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") category="Security" | stats count as Vulnerabilities</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -141,7 +141,7 @@
       <single>
         <title>License Issues</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ category="License" | stats count</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") category="License" | stats count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -155,7 +155,7 @@
       <single>
         <title>Violations</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ | stats count</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") | stats count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -169,7 +169,7 @@
       <single>
         <title>Infected Components</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ | stats dc(infected_components{})</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") | stats dc(infected_components{})</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -183,7 +183,7 @@
       <single>
         <title>Impacted Artifacts</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ | stats dc(impacted_artifacts{})</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") | stats dc(impacted_artifacts{})</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -199,7 +199,7 @@
       <chart>
         <title>Violations per Watch</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ | stats count by signature</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") | stats count by signature</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -214,7 +214,7 @@
       <chart>
         <title>Violations Severity</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ severity!=Unknown $vulnerability_control$ | stats count by severity</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") severity!=Unknown $vulnerability_control$ | stats count by severity</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -231,7 +231,7 @@
       <chart>
         <title>Violations by Policy</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ | stats count by matched_policies{}.policy</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") | stats count by matched_policies{}.policy</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -246,7 +246,7 @@
       <chart>
         <title>Violations by Rule</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ | stats count by matched_policies{}.rule</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") | stats count by matched_policies{}.rule</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -263,7 +263,7 @@
       <chart>
         <title>Violation Types over Time (Stats)</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" category!=NULL $vulnerability_control$ | timechart count by category</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") category!=NULL $vulnerability_control$ | timechart count by category</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -279,7 +279,7 @@
       <chart>
         <title>Violations over Time(By Severity)</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ severity!="unknown"  | timechart  count by severity</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") severity!="unknown"  | timechart  count by severity</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -298,7 +298,7 @@
       <chart>
         <title>Top Infected Components</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$  | stats count by infected_components{} | sort -count</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities")  | stats count by infected_components{} | sort -count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -314,7 +314,7 @@
       <chart>
         <title>Top Impacted Artifacts</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$  | stats count by impacted_artifacts{} | sort -count</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities")  | stats count by impacted_artifacts{} | sort -count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -368,7 +368,7 @@
       <chart>
         <title>Top Vulnerabilities</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ cve!="null" | stats count by cve | sort -count</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") cve!="null" | stats count by cve | sort -count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>
@@ -387,7 +387,7 @@
       <table>
         <title>Violation Details</title>
         <search>
-          <query>log_source="jfrog.xray.siem.vulnerabilities" $vulnerability_control$ impacted_artifacts{}=* | rex field=impacted_artifacts{} "(?&lt;impacted_artifacts&gt;.*)" | table impacted_artifacts{}, created, severity, cve, impacted_artifacts, signature, description, url, category | join type=outer impacted_artifacts [search `default_index` log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" | stats count(username) as user_count, count(ip) as ip_count by impacted_artifacts] |  eval user_count=(if(user_count&gt;0,user_count,0)) | eval ip_count=(if(ip_count&gt;0,ip_count,0)) | fields - impacted_artifacts | sort -user_count</query>
+          <query>`default_index` $vulnerability_control$ (sourcetype="jfrog.xray.siem.vulnerabilities" OR log_source="jfrog.xray.siem.vulnerabilities") impacted_artifacts{}=* | rex field=impacted_artifacts{} "(?&lt;impacted_artifacts&gt;.*)" | table impacted_artifacts{}, created, severity, cve, impacted_artifacts, signature, description, url, category | join type=outer impacted_artifacts [search `default_index` log_source = "jfrog.rt.artifactory.access" action_response = "ACCEPTED DOWNLOAD" | stats count(username) as user_count, count(ip) as ip_count by impacted_artifacts] |  eval user_count=(if(user_count&gt;0,user_count,0)) | eval ip_count=(if(ip_count&gt;0,ip_count,0)) | fields - impacted_artifacts | sort -user_count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
           <refresh>1m</refresh>

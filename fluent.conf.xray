@@ -103,6 +103,7 @@
       time_key timestamp
       time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
+  emit_invalid_record_to_error false
 </filter>
 <filter jfrog.**>
   @type record_transformer
@@ -118,6 +119,7 @@
   jpd_url JPD_URL
   username ADMIN_USERNAME
   apikey JFROG_API_KEY
+  token JFROG_ADMIN_TOKEN
   pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
 </source>
 <filter jfrog.xray.siem.*>
@@ -154,7 +156,9 @@
   metric_prefix 'jfrog.xray'
   jpd_url JPD_URL
   username ADMIN_USERNAME
-  apikey JFROG_API_KEY
+  apikey API_KEY
+  token JFROG_ADMIN_TOKEN
+  common_jpd COMMON_JPD
 </source>
 
 ####################
@@ -180,6 +184,7 @@
 
 <match jfrog.**>
   @type splunk_hec
+  protocol COM_PROTOCOL
   hec_host HEC_HOST
   hec_port HEC_PORT
   hec_token HEC_TOKEN
@@ -191,5 +196,6 @@
   flush_interval 10s
   # ssl parameter
   #use_ssl true
+  insecure_ssl INSECURE_SSL
   #ca_file /path/to/ca.pem
 </match>

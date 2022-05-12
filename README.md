@@ -246,6 +246,103 @@ helm repo update
 Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each of them, use the command
 ``openssl rand -hex 32``
 
+
+JFrog Platform ⎈:
+
+```textmate
+!!!Important Note!!!: Platform Chart Deployment shown here is for reference purpose only, 
+Kindly apply these charts only after reviewing the options and make necessary changes that suits your deployment
+```
+
+Pre-requisite for Observability integration with JFrog Platform charts 
+
+First, install the JFrog Platform chart by configuring intended replicaCount for Artifactory, Xray and enable or disable the solutions
+
+Refer the sample yaml for reference, download [here](https://github.com/jfrog/log-analytics-splunk/blob/master/helm/jfrog-platform-values-without-splunk.yaml)
+
+```yaml
+
+installerInfo: '{ "productId": "Helm_splunk_artifactory/{{ .Chart.Version }}", "features": [ { "featureId": "ArtifactoryVersion/{{ default .Chart.AppVersion .Values.artifactory.image.version }}" }, { "featureId": "{{ if .Values.postgresql.enabled }}postgresql{{ else }}{{ .Values.database.type }}{{ end }}/0.0.0" }, { "featureId": "Platform/{{ default "kubernetes" .Values.installer.platform }}" },  { "featureId": "Channel/Helm_splunk_artifactory" } ] }'
+artifactory:
+  artifactory:
+    openMetrics:
+      enabled: true
+xray:
+  enabled: true
+  replicaCount: 1  
+insight:
+  enabled: false
+distribution:
+  enabled: false
+pipelines:
+  enabled: false
+rabbitmq:
+  enabled: true
+redis:
+  enabled: false
+
+```
+To install the JFrog Platform with the above said configurations run the following command, (note the namespaces and adjust as needed by your deployment requirement)
+
+```kubernetes helm
+helm upgrade --install jfrog-platform --namespace jfrog-platform jfrog/jfrog-platform -f jfrog-platform-values-without-splunk.yaml
+```
+
+Once the platform is accessible, login to the platform and perform the setup as directed on the UI.
+
+Second, when your JFrog Platform is ready and accessible, the following should be noted
+
+1. Access Token - click [here](https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens-GeneratingScopedTokens) to know how to generate a admin scoped access token
+2. API Key - click [here](https://www.jfrog.com/confluence/display/RTF6X/Updating+Your+Profile#UpdatingYourProfile-APIKey) to generate an API Key with profile update process
+3. User - admin
+Refer [Fluentd Configuration for Splunk](#fluentd-configuration-for-splunk) section for configuring the below parameters
+3. Splunk Host - Splunk Instance URL
+4. Splunk Token - Token for sending data to Splunk
+5. Splunk Port - Splunk HEC Collector configured port
+6. COM Protocol - HTTP Scheme, http or https
+7. Insecure SSL - false for test environments only or if http scheme
+
+Once the values are noted, download the file to apply the JFrog Platform Upgrade for Splunk from [here](https://github.com/jfrog/log-analytics-splunk/blob/master/helm/jfrog-platform-values.yaml)
+
+Replace the respective values for the following in the global segment of chart values, review the chart values and apply them accordingly
+
+```yaml
+global:
+  splunk:
+    host: splunk.example.com
+    port: 8088
+    token: splunk_hec_token
+    metrics_token: splunk_metrics_hec_token
+    index: jfrog_splunk
+    com_protocol: https
+    insecure_ssl: false
+  jfrog:
+    observability:
+      metrics:
+        jpd_url: http://localhost:8082
+        jpd_url_nginx: http://jfrog-platform-artifactory-nginx
+        username: jfrog_user
+        apikey: jfrog_api_key
+        token: jfrog_token
+      branch: master
+```
+
+Once the values are replaced, apply the upgrade as mentioned
+
+1. Get the JFrog Platform Postgres Password and store it to a variable
+```shell
+export POSTGRES_PASSWORD=kubectl get secret -n jfrog-platform  jfrog-platform-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode
+```
+2. Using the password obtained, run the following upgrade command
+```kubernetes helm
+helm upgrade jfrog-platform --namespace jfrog-platform jfrog/jfrog-platform --set databaseUpgradeReady=true --set postgresql.postgresqlPassword=$POSTGRES_PASSWORD -f jfrog-platform-values.yaml
+```
+
+```textmate
+!!!Important Note!!!: Platform Chart Deployment shown here is for reference purpose only, 
+Kindly apply these charts only after reviewing the options and make necessary changes that suits your deployment
+```
+
 Artifactory ⎈:
 
 Replace the `splunk.example.com` in `splunk.host` at the end of the yaml file with IP address or DNS of Splunk HEC
@@ -378,6 +475,8 @@ else set this to 'true' to bypass SSL certificate verification.
   jpd_url JPD_URL
   username USERNAME
   apikey API_KEY
+  token JFROG_ADMIN_TOKEN
+  common_jpd false
 </source>
 ```
 _**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<ip_address>`
@@ -386,16 +485,17 @@ _**required**_: ```USERNAME``` is the Artifactory username for authentication
 
 _**required**_: ```API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
 
-Authenticate with the Artifactory API by replacing `<TOKEN>` with your bearer token in the downloaded `fluent.conf.rt` file.
-There should be two spots listed below:
+_**required**_: ```JFROG_ADMIN_TOKEN``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
 
-```
-command "curl --request GET 'http://localhost:8081/artifactory/api/system/version' -H 'Authorization: Bearer <TOKEN>'"
-headers {"Authorization":"Bearer <TOKEN>"}
-```
+## Note
 
-For information on authentication with a bearer token with artifactory, please visit [Bearer Token Authentication](https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens)
+* For Artifactory v7.4 and below only API Key must be used,
+* For Artifactory v7.4 to 7.29 either Token or API Key can be used,
+* For Artifactory v7.30 and above token only must be used. 
 
+* common_jpd: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray
+
+	* ex: https://sample_base_url/artifactory or https://sample_base_url/xray 
 
 ### Configuration steps for Xray
 
@@ -441,6 +541,8 @@ For open metrics data to be sent to splunk, Fill in the JPD_URL, USER, JFROG_API
   jpd_url JPD_URL
   username USERNAME
   apikey JFROG_API_KEY
+  token JFROG_ADMIN_TOKEN
+  common_jpd false
 </source>
 ```
 
@@ -449,6 +551,18 @@ _**required**_: ```JPD_URL``` is the Artifactory JPD URL of the format `http://<
 _**required**_: ```USER``` is the Artifactory username for authentication
 
 _**required**_: ```JFROG_API_KEY``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
+_**required**_: ```JFROG_ADMIN_TOKEN``` is the [Artifactory API Key](https://www.jfrog.com/confluence/display/JFROG/User+Profile#UserProfile-APIKey) for authentication
+
+## Note
+
+* For Artifactory v7.4 and below only API Key must be used,
+* For Artifactory v7.4 to 7.29 either Token or API Key can be used,
+* For Artifactory v7.30 and above token only must be used. 
+
+* common_jpd: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray
+
+	* ex: https://sample_base_url/artifactory or https://sample_base_url/xray 
 
 
 ```
