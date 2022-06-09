@@ -76,6 +76,16 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Click "Save"
 ````
 
+#### Create index jfrog_splunk_metrics
+````text
+1. Open Splunk web console as administrator
+2. Click on "Settings" in dropdown select "Indexes"
+3. Click on "New Index"
+4. Enter Index name as jfrog_splunk_metrics
+5. Click on 'Metrics' for the 'Index Data Type' 
+6. Click "Save"
+````
+
 #### Configure new HEC token to receive Logs
 ````text
 1. Open Splunk web console as administrator
