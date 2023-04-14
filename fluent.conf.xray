@@ -1,3 +1,5 @@
+# SOURCE DIRECTIVES
+# SERVICE LOGS
 <source>
   @type tail
   @id xray_server_tail
@@ -48,6 +50,7 @@
     @type none
   </parse>
 </source>
+# TRAEFIK LOGS
 <source>
   @type tail
   @id xray_router_traefik_tail
@@ -61,6 +64,7 @@
       time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
 </source>
+# REQUEST LOGS
 <source>
   @type tail
   @id xray_router_request_tail
@@ -86,116 +90,183 @@
     time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
 </source>
-<filter jfrog.xray.**.service>
-  @type record_transformer
-  enable_ruby true
-  <record>
-    message ${record["message"].gsub(/\e\[([;\d]+)?m/, '')}
-  </record>
-</filter>
-<filter jfrog.xray.**.service>
-  @type parser
-  key_name message
-  <parse>
-      @type multiline
-      format_firstline /\d{4}-\d{1,2}-\d{1,2}/
-      format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
-      time_key timestamp
-      time_format %Y-%m-%dT%H:%M:%S.%LZ
-  </parse>
-  emit_invalid_record_to_error false
-</filter>
-<filter jfrog.**>
-  @type record_transformer
-  <record>
-    hostname "#{Socket.gethostname}"
-    log_source ${tag}
-  </record>
-</filter>
 
-<source>
-  @type jfrog_siem
-  tag jfrog.xray.siem.vulnerabilities
-  jpd_url JPD_URL
-  username ADMIN_USERNAME
-  apikey JFROG_API_KEY
-  token JFROG_ADMIN_TOKEN
-  pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
-</source>
-<filter jfrog.xray.siem.*>
-  @type record_transformer
-  enable_ruby true
-  <record>
-    log_source "jfrog.xray.siem.vulnerabilities"
-    category ${record["type"]}
-    url ${record["violation_details_url"]}
-    signature ${record["watch_name"]}
-    cvss ${record["cvss_score"]}
-    cve ${record["cve"]}
-    vendor_product "Xray"
-  </record>
-</filter>
-<filter jfrog.xray.siem.*>
-  @type record_modifier
-  <record>
-    _impacted_artifacts_url_ ${if record.has_key?('impacted_artifacts_url'); record.delete('impacted_artifacts_url') ; end; nil}
-    _type_ ${if record.has_key?('type'); record.delete('type') ; end; nil}
-    _watch_name_ ${if record.has_key?('watch_name'); record.delete('watch_name') ; end; nil}
-    _violation_details_url_ ${if record.has_key?('violation_details_url'); record.delete('violation_details_url') ; end; nil}
-    _cvss_score_ ${if record.has_key?('cvss_score'); record.delete('cvss_score') ; end; nil}
-    _cvss_version_ ${if record.has_key?('cvss_version'); record.delete('cvss_version') ; end; nil}
-  </record>
-  remove_keys _impacted_artifacts_url_, _type_, _watch_name_, _violation_details_url_, _cvss_score_, _cvss_version_
-</filter>
 
+# FILTER DIRECTIVE
+## ALL LOGS
+<filter **>
+  @type concat
+  key message
+  multiline_start_regexp /\d{4}-\d{1,2}-\d{1,2}/
+  timeout_label @NORMAL
+  flush_interval 5
+</filter>
+<match **>
+  @type relabel
+  @label @NORMAL
+</match>
+<label @NORMAL>
+## SERVICE LOGS
+  <filter jfrog.xray.**.service>
+    @type record_transformer
+    enable_ruby true
+    <record>
+      message ${record["message"].gsub(/\e\[([;\d]+)?m/, '')}
+    </record>
+  </filter>
+  <filter jfrog.xray.persist.service>
+    @type parser
+    key_name message
+    <parse>
+        @type multiline
+        format_firstline /\d{4}-\d{1,2}-\d{1,2}/
+        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key timestamp
+        time_format %Y-%m-%dT%H:%M:%S.%LZ
+    </parse>
+  </filter>
+  <filter jfrog.xray.indexer.service>
+    @type parser
+    key_name message
+    <parse>
+        @type multiline
+        format_firstline /\d{4}-\d{1,2}-\d{1,2}/
+        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key timestamp
+        time_format %Y-%m-%dT%H:%M:%S.%LZ
+    </parse>
+  </filter>
+  <filter jfrog.xray.analysis.service>
+    @type parser
+    key_name message
+    <parse>
+        @type multiline
+        format_firstline /\d{4}-\d{1,2}-\d{1,2}/
+        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key timestamp
+        time_format %Y-%m-%dT%H:%M:%S.%LZ
+    </parse>
+  </filter>
+  <filter jfrog.xray.router.service>
+    @type parser
+    key_name message
+    <parse>
+        @type multiline
+        format_firstline /\d{4}-\d{1,2}-\d{1,2}/
+        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] \[\] -(?<message>.*)$/
+        time_key timestamp
+        time_format %Y-%m-%dT%H:%M:%S.%LZ
+    </parse>
+  </filter>
+  <filter jfrog.xray.server.service>
+    @type parser
+    key_name message
+    <parse>
+        @type multiline
+        format_firstline /\d{4}-\d{1,2}-\d{1,2}/
+        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key timestamp
+        time_format %Y-%m-%dT%H:%M:%S.%LZ
+    </parse>
+  </filter>
+  ## ALL LOGS
+  <filter jfrog.xray.**>
+    @type record_transformer
+    <record>
+      hostname "#{Socket.gethostname}"
+      log_source ${tag}
+    </record>
+  </filter>
+
+  # XRAY VIOLATIONS CONFIG
+  #<source>
+  #  @type jfrog_siem
+  #  tag jfrog.xray.siem.vulnerabilities
+  #  jpd_url JPD_URL
+  #  username ADMIN_USERNAME
+  #  apikey JFROG_API_KEY
+  #  token JFROG_ADMIN_TOKEN
+  #  pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
+  #</source>
+  #<filter jfrog.xray.siem.*>
+  #  @type record_transformer
+  #  enable_ruby true
+  #  <record>
+  #    log_source "jfrog.xray.siem.vulnerabilities"
+  #    category ${record["type"]}
+  #    url ${record["violation_details_url"]}
+  #    signature ${record["watch_name"]}
+  #    cvss ${record["cvss_score"]}
+  #    cve ${record["cve"]}
+  #    vendor_product "Xray"
+  #  </record>
+  #</filter>
+  #<filter jfrog.xray.siem.*>
+  #  @type record_modifier
+  #  <record>
+  #    _impacted_artifacts_url_ ${if record.has_key?('impacted_artifacts_url'); record.delete('impacted_artifacts_url') ; end; nil}
+  #    _type_ ${if record.has_key?('type'); record.delete('type') ; end; nil}
+  #    _watch_name_ ${if record.has_key?('watch_name'); record.delete('watch_name') ; end; nil}
+  #    _violation_details_url_ ${if record.has_key?('violation_details_url'); record.delete('violation_details_url') ; end; nil}
+  #    _cvss_score_ ${if record.has_key?('cvss_score'); record.delete('cvss_score') ; end; nil}
+  #    _cvss_version_ ${if record.has_key?('cvss_version'); record.delete('cvss_version') ; end; nil}
+  #  </record>
+  #  remove_keys _impacted_artifacts_url_, _type_, _watch_name_, _violation_details_url_, _cvss_score_, _cvss_version_
+  #</filter>
+
+  ####################
+  # SPLUNK OUTPUT
+  ####################
+  # SPLUNK XRAY LOGS OUTPUT
+  <match jfrog.xray.**>
+    @type splunk_hec
+    protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
+    hec_host "#{ENV['SPLUNK_HEC_HOST']}"
+    hec_port "#{ENV['SPLUNK_HEC_PORT']}"
+    hec_token "#{ENV['SPLUNK_HEC_TOKEN']}"
+    index jfrog_splunk
+    format json
+    sourcetype_key log_source
+    use_fluentd_time false
+    # buffered output parameter
+    flush_interval 10s
+    # ssl parameter
+    #use_ssl true
+    insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
+    #ca_file /path/to/ca.pem
+  </match>
+
+  # TEST OUTPUT
+  #<match **>
+  #  @type stdout
+  #</match>
+
+</label>
+
+# JFROG XRAY METRICS SOURCE
 <source>
   @type jfrog_metrics
   @id metrics_http_jfrt
   tag jfrog.metrics.xray
   interval 5s
   metric_prefix 'jfrog.xray'
-  jpd_url JPD_URL
-  username ADMIN_USERNAME
-  apikey API_KEY
-  token JFROG_ADMIN_TOKEN
-  common_jpd COMMON_JPD
+  jpd_url "#{ENV['JPD_URL']}"
+  username "#{ENV['JPD_ADMIN_USERNAME']}"
+  token "#{ENV['JFROG_ADMIN_TOKEN']}"
+  common_jpd "#{ENV['COMMON_JPD']}"
 </source>
-
-####################
-# SPLUNK OUTPUT
-####################
-
+# SPLUNK XRAY METRICS OUTPUT
 <match jfrog.metrics.**>
   @type splunk_hec
-  protocol COM_PROTOCOL
+  protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
   data_type metric
-  hec_host HEC_HOST
-  hec_port HEC_PORT
-  hec_token METRICS_HEC_TOKEN
+  hec_host "#{ENV['SPLUNK_HEC_HOST']}"
+  hec_port "#{ENV['SPLUNK_HEC_PORT']}"
+  hec_token "#{ENV['SPLUNK_METRICS_HEC_TOKEN']}"
   flush_interval 5s
   source ${tag}
   index jfrog_splunk_metrics
   metric_name_key metric_name
   metric_value_key value
-  insecure_ssl INSECURE_SSL
-  <fields>
-  </fields>
-</match>
-
-<match jfrog.**>
-  @type splunk_hec
-  protocol COM_PROTOCOL
-  hec_host HEC_HOST
-  hec_port HEC_PORT
-  hec_token HEC_TOKEN
-  index jfrog_splunk
-  format json
-  sourcetype_key log_source
-  use_fluentd_time false
-  # buffered output parameter
-  flush_interval 10s
-  # ssl parameter
-  #use_ssl true
-  insecure_ssl INSECURE_SSL
-  #ca_file /path/to/ca.pem
+  insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
 </match>
