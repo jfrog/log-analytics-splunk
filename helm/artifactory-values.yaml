@@ -9,24 +9,13 @@ artifactory:
         - '-c'
         - >
           mkdir -p {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/;
-          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
-          cp {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf  {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/HEC_HOST/{{ .Values.splunk.host }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/HEC_PORT/{{ .Values.splunk.port }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/METRICS_HEC_TOKEN/{{ .Values.splunk.metrics_token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/HEC_TOKEN/{{ .Values.splunk.token }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/COM_PROTOCOL/{{ .Values.splunk.com_protocol }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/INSECURE_SSL/{{ .Values.splunk.insecure_ssl }}/g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's|JPD_URL|{{ .Values.jfrog.observability.metrics.jpd_url }}|g' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/ADMIN_USERNAME/{{ .Values.jfrog.observability.metrics.username }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          sed -i -e 's/API_KEY/{{ .Values.jfrog.observability.metrics.apikey }}/' {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf;
-          mv {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluent.tmp.conf {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/PTRENG-4760-Updating-documentation/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf;
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
           name: artifactory-volume
   customSidecarContainers: |
     - name: "artifactory-fluentd-sidecar"
-      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.16.0"
+      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.23.0"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
@@ -34,19 +23,38 @@ artifactory:
       env:
         - name: JF_PRODUCT_DATA_INTERNAL
           value: {{ .Values.artifactory.persistence.mountPath }}
+        - name: JPD_URL
+          value: {{ .Values.jfrog.observability.jpd_url }}
+        - name: JPD_ADMIN_USERNAME
+          value: {{ .Values.jfrog.observability.username }}
+        - name: JFROG_ADMIN_TOKEN
+          value: {{ .Values.jfrog.observability.access_token }}
+        - name: COMMON_JPD
+          value: {{ .Values.jfrog.observability.common_jpd | quote }}
+        - name: SPLUNK_COM_PROTOCOL
+          value: {{ .Values.splunk.com_protocol }}
+        - name: SPLUNK_HEC_HOST
+          value: {{ .Values.splunk.host }}
+        - name: SPLUNK_HEC_PORT
+          value: {{ .Values.splunk.port | quote}}
+        - name: SPLUNK_METRICS_HEC_TOKEN
+          value: {{ .Values.splunk.metrics_token }}
+        - name: SPLUNK_HEC_TOKEN
+          value: {{ .Values.splunk.logs_token }}
+        - name: SPLUNK_INSECURE_SSL
+          value: {{ .Values.splunk.insecure_ssl | quote}}
         - name: FLUENTD_CONF
           value: ../../../../{{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
 splunk:
-  host: splunk.example.com
-  port: 8088
-  token: splunk_hec_token
-  metrics_token: splunk_metrics_hec_token
-  index: jfrog_splunk
-  com_protocol: https
-  insecure_ssl: false
+  host: SPLUNK_HEC_HOST
+  port: SPLUNK_HEC_PORT
+  logs_token: SPLUNK_HEC_TOKEN
+  metrics_token: SPLUNK_METRICS_HEC_TOKEN
+  com_protocol: SPLUNK_COM_PROTOCOL
+  insecure_ssl: SPLUNK_INSECURE_SSL
 jfrog:
   observability:
-    metrics:
-      jpd_url: jpd_url
-      username: jfrog_user
-      apikey: jfrog_api_key
+    jpd_url: JPD_URL
+    username: JPD_ADMIN_USERNAME
+    access_token: JFROG_ADMIN_TOKEN
+    common_jpd: COMMON_JPD
