@@ -1,3 +1,30 @@
+# JFROG XRAY METRICS SOURCE
+<source>
+  @type jfrog_metrics
+  @id metrics_http_jfrt
+  tag jfrog.metrics.xray
+  interval 5s
+  metric_prefix 'jfrog.xray'
+  jpd_url "#{ENV['JPD_URL']}"
+  username "#{ENV['JPD_ADMIN_USERNAME']}"
+  token "#{ENV['JFROG_ADMIN_TOKEN']}"
+  common_jpd "#{ENV['COMMON_JPD']}"
+</source>
+# SPLUNK XRAY METRICS OUTPUT
+<match jfrog.metrics.**>
+  @type splunk_hec
+  protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
+  data_type metric
+  hec_host "#{ENV['SPLUNK_HEC_HOST']}"
+  hec_port "#{ENV['SPLUNK_HEC_PORT']}"
+  hec_token "#{ENV['SPLUNK_METRICS_HEC_TOKEN']}"
+  flush_interval 5s
+  source ${tag}
+  index jfrog_splunk_metrics
+  metric_name_key metric_name
+  metric_value_key value
+  insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
+</match>
 # SOURCE DIRECTIVES
 # SERVICE LOGS
 <source>
@@ -242,31 +269,3 @@
   #</match>
 
 </label>
-
-# JFROG XRAY METRICS SOURCE
-<source>
-  @type jfrog_metrics
-  @id metrics_http_jfrt
-  tag jfrog.metrics.xray
-  interval 5s
-  metric_prefix 'jfrog.xray'
-  jpd_url "#{ENV['JPD_URL']}"
-  username "#{ENV['JPD_ADMIN_USERNAME']}"
-  token "#{ENV['JFROG_ADMIN_TOKEN']}"
-  common_jpd "#{ENV['COMMON_JPD']}"
-</source>
-# SPLUNK XRAY METRICS OUTPUT
-<match jfrog.metrics.**>
-  @type splunk_hec
-  protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
-  data_type metric
-  hec_host "#{ENV['SPLUNK_HEC_HOST']}"
-  hec_port "#{ENV['SPLUNK_HEC_PORT']}"
-  hec_token "#{ENV['SPLUNK_METRICS_HEC_TOKEN']}"
-  flush_interval 5s
-  source ${tag}
-  index jfrog_splunk_metrics
-  metric_name_key metric_name
-  metric_value_key value
-  insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
-</match>
