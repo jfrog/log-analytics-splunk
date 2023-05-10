@@ -25,6 +25,58 @@
   metric_value_key value
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
 </match>
+
+# XRAY VIOLATIONS CONFIG
+<source>
+  @type jfrog_siem
+  tag jfrog.xray.siem.vulnerabilities
+  jpd_url "#{ENV['JPD_URL']}"
+  username "#{ENV['JPD_ADMIN_USERNAME']}"
+  token "#{ENV['JFROG_ADMIN_TOKEN']}"
+  pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
+</source>
+<filter jfrog.xray.siem.*>
+  @type record_transformer
+  enable_ruby true
+  <record>
+    log_source "jfrog.xray.siem.vulnerabilities"
+    category ${record["type"]}
+    url ${record["violation_details_url"]}
+    signature ${record["watch_name"]}
+    cvss ${record["cvss_score"]}
+    cve ${record["cve"]}
+    vendor_product "Xray"
+  </record>
+</filter>
+<filter jfrog.xray.siem.*>
+  @type record_modifier
+  <record>
+    _impacted_artifacts_url_ ${if record.has_key?('impacted_artifacts_url'); record.delete('impacted_artifacts_url') ; end; nil}
+    _type_ ${if record.has_key?('type'); record.delete('type') ; end; nil}
+    _watch_name_ ${if record.has_key?('watch_name'); record.delete('watch_name') ; end; nil}
+    _violation_details_url_ ${if record.has_key?('violation_details_url'); record.delete('violation_details_url') ; end; nil}
+    _cvss_score_ ${if record.has_key?('cvss_score'); record.delete('cvss_score') ; end; nil}
+    _cvss_version_ ${if record.has_key?('cvss_version'); record.delete('cvss_version') ; end; nil}
+  </record>
+  remove_keys _impacted_artifacts_url_, _type_, _watch_name_, _violation_details_url_, _cvss_score_, _cvss_version_
+</filter>
+<match jfrog.xray.siem.**>
+  @type splunk_hec
+  protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
+  hec_host "#{ENV['SPLUNK_HEC_HOST']}"
+  hec_port "#{ENV['SPLUNK_HEC_PORT']}"
+  hec_token "#{ENV['SPLUNK_HEC_TOKEN']}"
+  index jfrog_splunk
+  format json
+  sourcetype_key log_source
+  use_fluentd_time false
+  # buffered output parameter
+  flush_interval 10s
+  # ssl parameter
+  #use_ssl true
+  insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
+  #ca_file /path/to/ca.pem
+</match>
 # SOURCE DIRECTIVES
 # SERVICE LOGS
 <source>
@@ -204,42 +256,6 @@
       log_source ${tag}
     </record>
   </filter>
-
-  # XRAY VIOLATIONS CONFIG
-  #<source>
-  #  @type jfrog_siem
-  #  tag jfrog.xray.siem.vulnerabilities
-  #  jpd_url JPD_URL
-  #  username ADMIN_USERNAME
-  #  apikey JFROG_API_KEY
-  #  token JFROG_ADMIN_TOKEN
-  #  pos_file_path "#{ENV['JF_PRODUCT_DATA_INTERNAL']}/log/jfrog_siem.log.pos"
-  #</source>
-  #<filter jfrog.xray.siem.*>
-  #  @type record_transformer
-  #  enable_ruby true
-  #  <record>
-  #    log_source "jfrog.xray.siem.vulnerabilities"
-  #    category ${record["type"]}
-  #    url ${record["violation_details_url"]}
-  #    signature ${record["watch_name"]}
-  #    cvss ${record["cvss_score"]}
-  #    cve ${record["cve"]}
-  #    vendor_product "Xray"
-  #  </record>
-  #</filter>
-  #<filter jfrog.xray.siem.*>
-  #  @type record_modifier
-  #  <record>
-  #    _impacted_artifacts_url_ ${if record.has_key?('impacted_artifacts_url'); record.delete('impacted_artifacts_url') ; end; nil}
-  #    _type_ ${if record.has_key?('type'); record.delete('type') ; end; nil}
-  #    _watch_name_ ${if record.has_key?('watch_name'); record.delete('watch_name') ; end; nil}
-  #    _violation_details_url_ ${if record.has_key?('violation_details_url'); record.delete('violation_details_url') ; end; nil}
-  #    _cvss_score_ ${if record.has_key?('cvss_score'); record.delete('cvss_score') ; end; nil}
-  #    _cvss_version_ ${if record.has_key?('cvss_version'); record.delete('cvss_version') ; end; nil}
-  #  </record>
-  #  remove_keys _impacted_artifacts_url_, _type_, _watch_name_, _violation_details_url_, _cvss_score_, _cvss_version_
-  #</filter>
 
   ####################
   # SPLUNK OUTPUT

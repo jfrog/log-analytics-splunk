@@ -26,6 +26,78 @@
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
 </match>
 
+# ALL CALLHOME
+<source>
+  @type exec
+  tag callhome
+  command "curl --request GET '#{ENV['JPD_URL']}/artifactory/api/system/version' -H 'Authorization: Bearer #{ENV['JFROG_ADMIN_TOKEN']}'"
+  run_interval 1h
+  <parse>
+    @type json
+  </parse>
+</source>
+<match callhome>
+  @type copy
+  <store>
+    @type relabel
+    @label @jfrogcalhome
+  </store>
+  <store>
+    @type relabel
+    @label @heapcallhome
+  </store>
+</match>
+<label @heapcallhome>
+  <filter callhome>
+    @type record_transformer
+    renew_record true
+    keep_keys 'productId,features'
+    enable_ruby true
+    <record>
+      app_id '251985503'
+      identity 'OnPremObservability-Splunk/1.0.0'
+      event 'splunk-artifactory-fluent-config'
+      properties ${return({"featureId" => "ArtifactoryVersion/" + record["version"]})}
+    </record>
+  </filter>
+  <match callhome>
+    @type http
+    endpoint "https://heapanalytics.com/api/track"
+    open_timeout 5
+    content_type application/json
+    <format>
+      @type json
+    </format>
+    <buffer>
+      flush_interval 5s
+    </buffer>
+  </match>
+</label>
+<label @jfrogcalhome>
+  <filter callhome>
+    @type record_transformer
+    renew_record true
+    keep_keys 'productId,features'
+    enable_ruby true
+    <record>
+      productId 'OnPremObservability-Splunk/1.0.0'
+      features ${return([{"featureId" => "ArtifactoryVersion/" + record["version"]}])}
+    </record>
+  </filter>
+  <match callhome>
+    @type http
+    endpoint "https://heapanalytics.com/api/track"
+    open_timeout 5
+    content_type application/json
+    <format>
+      @type json
+    </format>
+    <buffer>
+      flush_interval 5s
+    </buffer>
+  </match>
+</label>
+
 # LOG SOURCE DIRECTIVES
 ## SERVICE LOGS
 <source>
@@ -302,46 +374,10 @@
     </record>
   </filter>
 
-  # CALL HOME
-  #<source>
-  #  @type exec
-  #  tag jfrog.callhome
-  #  command "curl --request GET 'JPD_URL/artifactory/api/system/version' -H 'Authorization: Bearer JFROG_ADMIN_TOKEN'"
-  #  run_interval 1d
-  #  <parse>
-  #    @type json
-  #  </parse>
-  #</source>
-  #<filter jfrog.callhome>
-  #  @type record_transformer
-  #  renew_record true
-  #  keep_keys 'productId,features'
-  #  enable_ruby true
-  #  <record>
-  #    productId 'jfrogLogAnalyticsSplunk/0.13.0'
-  #    features ${return([{"featureId" => "ArtifactoryVersion/" + record["version"]}])}
-  #  </record>
-  #</filter>
-  #<match jfrog.callhome>
-  #  @type http
-  #  endpoint JPD_URL/artifactory/api/system/usage
-  #  open_timeout 5
-  #  content_type application/json
-  #  headers {"Authorization":"Bearer JFROG_ADMIN_TOKEN"}
-  #  <format>
-  #    @type json
-  #  </format>
-  #  <buffer>
-  #    flush_interval 5s
-  #  </buffer>
-  #</match>
-
-
   # TEST OUTPUT
   #<match **>
   #  @type stdout
   #</match>
-
 
   # SPLUNK OUTPUT
   ## SPLUNK ARTIFACTORY LOGS OUTPUT
