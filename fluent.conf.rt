@@ -31,7 +31,7 @@
   @type exec
   tag callhome
   command "curl --request GET '#{ENV['JPD_URL']}/artifactory/api/system/version' -H 'Authorization: Bearer #{ENV['JFROG_ADMIN_TOKEN']}'"
-  run_interval 1h
+  run_interval 24h
   <parse>
     @type json
   </parse>
