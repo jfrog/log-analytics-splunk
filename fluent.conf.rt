@@ -231,7 +231,7 @@
   tag jfrog.rt.artifactory.access
   <parse>
     @type regexp
-    expression /^(?<timestamp>[^ ]*) \[(?<trace_id>[^\]]*)\] \[(?<action_response>[^\]]*)\] (?<repo_path>.*) for client : (?<username>.+)\/(?<ip>\s*\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})(?<message>\..+)?$/
+    expression /^(?<timestamp>[^ ]*) \[(?<trace_id>[^\]]*)\] \[(?<action_response>[^\]]*)\] (?<repo_path>.*) for client : (?<username>.+)\/(?<ip>\s*\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})\.(?<message>.+)?$/
     time_key timestamp
     time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
@@ -375,9 +375,9 @@
   </filter>
 
   # TEST OUTPUT
-  #<match **>
-  #  @type stdout
-  #</match>
+  <match **>
+    @type stdout
+  </match>
 
   # SPLUNK OUTPUT
   ## SPLUNK ARTIFACTORY LOGS OUTPUT
