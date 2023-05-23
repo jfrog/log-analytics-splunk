@@ -396,12 +396,18 @@
     format json
     sourcetype_key log_source
     use_fluentd_time false
-    # buffered output parameter
-    flush_interval 10s
     insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
     # ssl parameter
-    #use_ssl true
-    #ca_file /path/to/ca.pem
+    # use_ssl true
+    # ca_file /path/to/ca.pem
+    <buffer>
+      flush_interval 1s
+      # frequency of the buffer flush
+      flush_thread_count 5
+      # The number of threads to flush/write chunks in parallel
+      chunk_limit_records 10
+      # The max number of events that each chunks can store in it
+    </buffer>
   </match>
 </label>
 
