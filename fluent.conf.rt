@@ -86,9 +86,14 @@
   </filter>
   <match callhome>
     @type http
-    endpoint "https://heapanalytics.com/api/track"
+    endpoint "#{ENV['JPD_URL']}/artifactory/api/system/usage"
     open_timeout 5
     content_type application/json
+    <auth>
+      method basic
+      username "#{ENV['JPD_ADMIN_USERNAME']}"
+      password "#{ENV['JFROG_ADMIN_TOKEN']}"
+    </auth>
     <format>
       @type json
     </format>

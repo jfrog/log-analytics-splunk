@@ -26,6 +26,84 @@
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
 </match>
 
+# ALL CALLHOME
+<source>
+  @type exec
+  tag callhome
+  command "curl --request GET '#{ENV['JPD_URL']}/xray/api/v1/system/version' -H 'Authorization: Bearer #{ENV['JFROG_ADMIN_TOKEN']}'"
+  run_interval 24h
+  <parse>
+    @type json
+  </parse>
+</source>
+<match callhome>
+  @type copy
+  <store>
+    @type relabel
+    @label @jfrogcalhome
+  </store>
+  <store>
+    @type relabel
+    @label @heapcallhome
+  </store>
+</match>
+<label @heapcallhome>
+  <filter callhome>
+    @type record_transformer
+    renew_record true
+    keep_keys 'productId,features'
+    enable_ruby true
+    <record>
+      app_id '251985503'
+      identity 'OnPremObservability-Splunk/1.0.0'
+      event 'splunk-xray-fluent-config'
+      properties ${return({"featureId" => "XrayVersion/" + record["xray_version"]})}
+    </record>
+  </filter>
+  <match callhome>
+    @type http
+    endpoint "https://heapanalytics.com/api/track"
+    open_timeout 5
+    content_type application/json
+    <format>
+      @type json
+    </format>
+    <buffer>
+      flush_interval 5s
+    </buffer>
+  </match>
+</label>
+<label @jfrogcalhome>
+  <filter callhome>
+    @type record_transformer
+    renew_record true
+    keep_keys 'productId,features'
+    enable_ruby true
+    <record>
+      productId 'OnPremObservability-Splunk/1.0.0'
+      features ${return([{"featureId" => "XrayVersion/" + record["xray_version"]}])}
+    </record>
+  </filter>
+  <match callhome>
+    @type http
+    endpoint "#{ENV['JPD_URL']}/artifactory/api/system/usage"
+    open_timeout 5
+    content_type application/json
+    <auth>
+      method basic
+      username "#{ENV['JPD_ADMIN_USERNAME']}"
+      password "#{ENV['JFROG_ADMIN_TOKEN']}"
+    </auth>
+    <format>
+      @type json
+    </format>
+    <buffer>
+      flush_interval 5s
+    </buffer>
+  </match>
+</label>
+
+
 # XRAY VIOLATIONS CONFIG
 <source>
   @type jfrog_siem
@@ -203,6 +281,7 @@
         time_key timestamp
         time_format %Y-%m-%dT%H:%M:%S.%LZ
     </parse>
+    emit_invalid_record_to_error false
   </filter>
   <filter jfrog.xray.indexer.service>
     @type parser
@@ -214,6 +293,7 @@
         time_key timestamp
         time_format %Y-%m-%dT%H:%M:%S.%LZ
     </parse>
+    emit_invalid_record_to_error false
   </filter>
   <filter jfrog.xray.analysis.service>
     @type parser
