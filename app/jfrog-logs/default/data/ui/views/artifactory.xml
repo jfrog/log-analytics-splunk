@@ -61,7 +61,7 @@
       <chart>
         <title>Log Volume</title>
         <search>
-          <query>`default_index` $application_control$ log_source!="NULL" log_source!="jfrog.xray.*" | timechart count by log_source</query>
+          <query>`default_index` $application_control$ (sourcetype!="NULL" OR log_source!="NULL") (sourcetype!="jfrog.xray.*" OR log_source!="jfrog.xray.*") | timechart count by sourcetype</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -177,7 +177,7 @@
       <single>
         <title>Dockerhub Pull Requests Trends Per 6 Hours</title>
         <search>
-          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart count(message) span=6h as DockerPullRequests</query>
+          <query>`default_index` $docker_control$ "downloading" (log_source="jfrog.rt.artifactory.service" OR sourcetype="jfrog.rt.artifactory.service") "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart count(message) span=6h as DockerPullRequests</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -188,8 +188,8 @@
       <chart>
         <title>Docker Repositories Cache Hit Ratio</title>
         <search>
-          <query>`default_index` $docker_control$ log_source="jfrog.rt.artifactory.access" action_response="ACCEPTED DOWNLOAD"  "list\.manifest"
-            | stats count as aCount | appendcols [search log_source="jfrog.rt.artifactory.access" action_response="ACCEPTED DEPLOY"  "list\.manifest" "*-cache" | stats count as bCount ]  | eval pct=bCount/aCount | eval inversePct=1-pct | fields - aCount,bCount,pct</query>
+          <query>`default_index` $docker_control$  (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") action_response="ACCEPTED DOWNLOAD"  "list\.manifest"
+            | stats count as aCount | appendcols [search (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") action_response="ACCEPTED DEPLOY"  "list\.manifest" "*-cache" | stats count as bCount ]  | eval pct=bCount/aCount | eval inversePct=1-pct | fields - aCount,bCount,pct</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -206,7 +206,7 @@
       <chart>
         <title>Dockerhub Pull Requests in rolling 6 Hr window</title>
         <search>
-          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart span=1h count(message) as Count | streamstats sum(Count) as Count window=6 | eval warning = 100 | eval critical = 200</query>
+          <query>`default_index` $docker_control$  "downloading" (log_source="jfrog.rt.artifactory.service" OR sourcetype="jfrog.rt.artifactory.service") "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart span=1h count(message) as Count | streamstats sum(Count) as Count window=6 | eval warning = 100 | eval critical = 200</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -224,7 +224,7 @@
       <chart>
         <title>Dockerhub Pull Requests Total</title>
         <search>
-          <query>`default_index` $docker_control$ "downloading" log_source="jfrog.rt.artifactory.service" "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart count(message) as Count</query>
+          <query>`default_index` $docker_control$ "downloading" (log_source="jfrog.rt.artifactory.service" OR sourcetype="jfrog.rt.artifactory.service") "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart count(message) as Count</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -242,7 +242,7 @@
       <chart>
         <title>Top 10 Users By Docker Pulls</title>
         <search>
-          <query>`default_index` $docker_control$ log_source="jfrog.rt.artifactory.access" "list\.manifest" "ACCEPTED DEPLOY" | top limit=10 username </query>
+          <query>`default_index` $docker_control$ (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") "list\.manifest" "ACCEPTED DEPLOY" | top limit=10 username</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -258,7 +258,7 @@
       <chart>
         <title>Top 10 IPs By Docker Pulls</title>
         <search>
-          <query>`default_index` $docker_control$ log_source="jfrog.rt.artifactory.access" "list\.manifest" "ACCEPTED DEPLOY" | top limit=10 ip </query>
+          <query>`default_index` $docker_control$  (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") "list\.manifest" "ACCEPTED DEPLOY" | top limit=10 ip</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>

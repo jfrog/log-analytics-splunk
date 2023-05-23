@@ -4,14 +4,21 @@ xray:
   jfrogUrl: http://xray-xray.rt:8082
 replicaCount: 1
 postgresql:
-  postgresqlPassword: xray
+  postgresqlPassword: password
 rabbitmq-ha:
   enabled: false
 rabbitmq:
   enabled: true
+  replicaCount: 1
+  rbac:
+    create: true
+  image:
+    registry: releases-docker.jfrog.io
+    repository: bitnami/rabbitmq
+    tag: 3.11.10-debian-11-r5
   auth:
     username: guest
-    password: guest
+    password: password
 common:
   customInitContainersBegin: |
     - name: "prepare-fluentd-conf-on-persistent-volume"
@@ -28,7 +35,7 @@ common:
           name: data-volume
   customSidecarContainers: |
     - name: "xray-platform-fluentd-sidecar"
-      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.23.0"
+      image: "partnership-public-images.jfrog.io/fluentd/fluentd:1.26.0"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
