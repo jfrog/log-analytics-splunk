@@ -141,7 +141,7 @@ gem install fluent-plugin-jfrog-metrics
 ````
 
 #### Configure Fluentd
-We rely heavily on environment variables so that the correct log files are streamed to your observability dashboards. Ensure that you fill in the .env files with correct values. Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog)
+We rely heavily on environment variables so that the correct log files are streamed to your observability dashboards. Ensure that you fill in the .env file with correct values. Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog)
 
 * **JF_PRODUCT_DATA_INTERNAL**: The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https

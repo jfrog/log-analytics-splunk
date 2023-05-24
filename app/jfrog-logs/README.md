@@ -13,7 +13,7 @@ Install the app in your Splunk instance. Then restart your Splunk instance by go
 ## Setup Fluentd
 FluentD is used to send log events to Splunk. This [repo](https://github.com/jfrog/log-analytics-splunk) contains instructions on various installations options for Fluentd as a logging agent. 
 
-Fill in the .env_artifactory and .env_xray files with Splunk and JPD information
+Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog) and fill in the .env_jfrog file with Splunk and JPD information
 
 ```
 export JF_PRODUCT_DATA_INTERNAL=JF_PRODUCT_DATA_INTERNAL
