@@ -141,7 +141,7 @@ gem install fluent-plugin-jfrog-metrics
 ````
 
 #### Configure Fluentd
-We rely heavily on environment variables so that the correct log files are streamed to your observability dashboards. Ensure that you fill in the .env files with correct values
+We rely heavily on environment variables so that the correct log files are streamed to your observability dashboards. Ensure that you fill in the .env files with correct values. Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog)
 
 * **JF_PRODUCT_DATA_INTERNAL**: The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
@@ -158,7 +158,7 @@ We rely heavily on environment variables so that the correct log files are strea
 Apply the .env files and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
 
 ````text
-source .env_<product_name>
+source .env_jfrog
 ./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
 ````
 
@@ -231,7 +231,7 @@ Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each o
 ``openssl rand -hex 32``
 
 #### Artifactory ⎈:
-For Artifactory installation, Fill in the .env_artifactory file with correct values. 
+For Artifactory installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values. 
 
 * **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
@@ -248,7 +248,7 @@ For Artifactory installation, Fill in the .env_artifactory file with correct val
 Apply the .env files and then run the helm command below
 
 ````text
-source .env_artifactory
+source .env_jfrog
 ````
 ```text
 helm upgrade --install artifactory  jfrog/artifactory \
@@ -273,7 +273,7 @@ For HA installation, please create a license secret on your cluster prior to ins
 ```text
 kubectl create secret generic artifactory-license --from-file=<path_to_license_file>artifactory.cluster.license 
 ```
-Fill in the .env_artifactory file with correct values.
+Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values.
 
 * **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
@@ -290,7 +290,7 @@ Fill in the .env_artifactory file with correct values.
 Apply the .env files and then run the helm command below
 
 ````text
-source .env_artifactory
+source .env_jfrog
 ````
 ```text
 helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
@@ -310,7 +310,7 @@ helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
 ```
 
 #### Xray ⎈:
-For Artifactory installation, Fill in the .env_xray file with correct values.
+For Artifactory installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values.
 
 * **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
@@ -327,7 +327,7 @@ For Artifactory installation, Fill in the .env_xray file with correct values.
 Apply the .env files and then run the helm command below
 
 ````text
-source .env_xray
+source .env_jfrog
 ````
 
 Use the same `joinKey` as you used in Artifactory installation to allow Xray node to successfully connect to Artifactory.
