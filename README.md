@@ -143,17 +143,17 @@ gem install fluent-plugin-jfrog-metrics
 #### Configure Fluentd
 We rely heavily on environment variables so that the correct log files are streamed to your observability dashboards. Ensure that you fill in the .env files with correct values
 
-1. JF_PRODUCT_DATA_INTERNAL: The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory
-2. SPLUNK_COM_PROTOCOL: HTTP Scheme, http or https
-3. SPLUNK_HEC_HOST: Splunk Instance URL
-4. SPLUNK_HEC_PORT: Splunk HEC configured port
-5. SPLUNK_HEC_TOKEN: Splunk HEC Token for sending logs to Splunk
-6. SPLUNK_METRICS_HEC_TOKEN: Splunk HEC Token for sending metrics to Splunk
-7. SPLUNK_INSECURE_SSL: false for test environments only or if http scheme. 
-8. JPD_URL: Artifactory JPD URL of the format `http://<ip_address>`
-9. JPD_ADMIN_USERNAME: Artifactory username for authentication
-10. JFROG_ADMIN_TOKEN: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
-11. COMMON_JPD: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+* **JF_PRODUCT_DATA_INTERNAL**: The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory
+* **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
+* **SPLUNK_HEC_HOST**: Splunk Instance URL
+* **SPLUNK_HEC_PORT**: Splunk HEC configured port
+* **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
+* **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+* **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme. 
+* **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
+* **JPD_ADMIN_USERNAME**: Artifactory username for authentication
+* **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
+* **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
 Apply the .env files and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
 
@@ -233,17 +233,17 @@ Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each o
 #### Artifactory ⎈:
 For Artifactory installation, Fill in the .env_artifactory file with correct values. 
 
-1. JF_PRODUCT_DATA_INTERNAL: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
-2. SPLUNK_COM_PROTOCOL: HTTP Scheme, http or https
-3. SPLUNK_HEC_HOST: Splunk Instance URL
-4. SPLUNK_HEC_PORT: Splunk HEC configured port
-5. SPLUNK_HEC_TOKEN: Splunk HEC Token for sending logs to Splunk
-6. SPLUNK_METRICS_HEC_TOKEN: Splunk HEC Token for sending metrics to Splunk
-7. SPLUNK_INSECURE_SSL: false for test environments only or if http scheme
-8. JPD_URL: Artifactory JPD URL of the format `http://<ip_address>`
-9. JPD_ADMIN_USERNAME: Artifactory username for authentication
-10. JFROG_ADMIN_TOKEN: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
-11. COMMON_JPD: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+* **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
+* **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
+* **SPLUNK_HEC_HOST**: Splunk Instance URL
+* **SPLUNK_HEC_PORT**: Splunk HEC configured port
+* **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
+* **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+* **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+* **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
+* **JPD_ADMIN_USERNAME**: Artifactory username for authentication
+* **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
+* **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
 Apply the .env files and then run the helm command below
 
@@ -275,17 +275,17 @@ kubectl create secret generic artifactory-license --from-file=<path_to_license_f
 ```
 Fill in the .env_artifactory file with correct values.
 
-1. JF_PRODUCT_DATA_INTERNAL: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
-2. SPLUNK_COM_PROTOCOL: HTTP Scheme, http or https
-3. SPLUNK_HEC_HOST: Splunk Instance URL
-4. SPLUNK_HEC_PORT: Splunk HEC configured port
-5. SPLUNK_HEC_TOKEN: Splunk HEC Token for sending logs to Splunk
-6. SPLUNK_METRICS_HEC_TOKEN: Splunk HEC Token for sending metrics to Splunk
-7. SPLUNK_INSECURE_SSL: false for test environments only or if http scheme
-8. JPD_URL: Artifactory JPD URL of the format `http://<ip_address>`
-9. JPD_ADMIN_USERNAME: Artifactory username for authentication
-10. JFROG_ADMIN_TOKEN: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
-11. COMMON_JPD: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+* **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
+* **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
+* **SPLUNK_HEC_HOST**: Splunk Instance URL
+* **SPLUNK_HEC_PORT**: Splunk HEC configured port
+* **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
+* **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+* **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+* **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
+* **JPD_ADMIN_USERNAME**: Artifactory username for authentication
+* **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
+* **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
 Apply the .env files and then run the helm command below
 
@@ -312,17 +312,17 @@ helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
 #### Xray ⎈:
 For Artifactory installation, Fill in the .env_xray file with correct values.
 
-1. JF_PRODUCT_DATA_INTERNAL: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
-2. SPLUNK_COM_PROTOCOL: HTTP Scheme, http or https
-3. SPLUNK_HEC_HOST: Splunk Instance URL
-4. SPLUNK_HEC_PORT: Splunk HEC configured port
-5. SPLUNK_HEC_TOKEN: Splunk HEC Token for sending logs to Splunk
-6. SPLUNK_METRICS_HEC_TOKEN: Splunk HEC Token for sending metrics to Splunk
-7. SPLUNK_INSECURE_SSL: false for test environments only or if http scheme
-8. JPD_URL: Artifactory JPD URL of the format `http://<ip_address>`
-9. JPD_ADMIN_USERNAME: Artifactory username for authentication
-10. JFROG_ADMIN_TOKEN: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
-11. COMMON_JPD: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+* **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
+* **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
+* **SPLUNK_HEC_HOST**: Splunk Instance URL
+* **SPLUNK_HEC_PORT**: Splunk HEC configured port
+* **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
+* **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+* **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+* **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
+* **JPD_ADMIN_USERNAME**: Artifactory username for authentication
+* **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
+* **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
 Apply the .env files and then run the helm command below
 
