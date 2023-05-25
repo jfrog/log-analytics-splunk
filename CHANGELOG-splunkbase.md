@@ -1,4 +1,4 @@
-## [1.2.5] - May 26th, 2023
+## [1.2.6] - May 26th, 2023
 * Verified dashboard widget queries for Artifactory and Xray dashboards
 * Updated documentation to setup JFrog Splunk Integration
 
