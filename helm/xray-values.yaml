@@ -3,22 +3,6 @@ databaseUpgradeReady: true
 xray:
   jfrogUrl: http://xray-xray.rt:8082
 replicaCount: 1
-postgresql:
-  postgresqlPassword: password
-rabbitmq-ha:
-  enabled: false
-rabbitmq:
-  enabled: true
-  replicaCount: 1
-  rbac:
-    create: true
-  image:
-    registry: releases-docker.jfrog.io
-    repository: bitnami/rabbitmq
-    tag: 3.11.10-debian-11-r5
-  auth:
-    username: guest
-    password: password
 common:
   customInitContainersBegin: |
     - name: "prepare-fluentd-conf-on-persistent-volume"
