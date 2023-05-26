@@ -13,7 +13,7 @@ common:
         - '-c'
         - >
           mkdir -p {{ .Values.xray.persistence.mountPath }}/etc/fluentd/;
-          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/PTRENG-4760-Updating-documentation/fluent.conf.xray -o {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf;
+          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray -o {{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf;
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
           name: data-volume

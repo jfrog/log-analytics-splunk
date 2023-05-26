@@ -25,8 +25,8 @@ RUN apt-get update && apt-get install -y curl
 CMD /bin/bash
 
 ## Download Config Files
-RUN if [ "$SRC_PLATFORM" = "JFRT" ] ; then echo "Downloading the fluentd config file for $SRC_PLATFORM and $TGT_PLATFORM "; curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/PTRENG-4760-Updating-documentation/fluent.conf.rt -o /opt/bitnami/fluentd/conf/fluentd.conf; else echo "Not Downloading"; fi
-RUN if [ "$SRC_PLATFORM" = "JFXRAY" ] ; then echo "Downloading the fluentd config file for $SRC_PLATFORM and $TGT_PLATFORM "; curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/PTRENG-4760-Updating-documentation/fluent.conf.xray -o /opt/bitnami/fluentd/conf/fluentd.conf; else echo "Not Downloading"; fi
+RUN if [ "$SRC_PLATFORM" = "JFRT" ] ; then echo "Downloading the fluentd config file for $SRC_PLATFORM and $TGT_PLATFORM "; curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o /opt/bitnami/fluentd/conf/fluentd.conf; else echo "Not Downloading"; fi
+RUN if [ "$SRC_PLATFORM" = "JFXRAY" ] ; then echo "Downloading the fluentd config file for $SRC_PLATFORM and $TGT_PLATFORM "; curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray -o /opt/bitnami/fluentd/conf/fluentd.conf; else echo "Not Downloading"; fi
 
 ENTRYPOINT if [ "$TGT_PLATFORM" = "SPLUNK" ] ; then cat /opt/bitnami/fluentd/conf/fluentd.conf; fluentd -v -c /opt/bitnami/fluentd/conf/fluentd.conf; fi
 
