@@ -380,9 +380,9 @@
   </filter>
 
   # TEST OUTPUT
-  <match **>
-    @type stdout
-  </match>
+  #<match **>
+  #  @type stdout
+  #</match>
 
   # SPLUNK OUTPUT
   ## SPLUNK ARTIFACTORY LOGS OUTPUT
