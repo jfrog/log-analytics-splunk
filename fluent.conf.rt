@@ -55,9 +55,9 @@
     enable_ruby true
     <record>
       app_id '251985503'
-      identity 'OnPremObservability-Splunk/1.0.0'
-      event 'splunk-artifactory-fluent-config'
-      properties ${return({"featureId" => "ArtifactoryVersion/" + record["version"]})}
+      identity "#{ENV['JPD_URL']}"
+      event 'splunk-artifactory-fluentd-config'
+      properties ${return({"featureId" => "ArtifactoryVersion/" + record["version"], "productId" => "OnPremObservability-Splunk/1.0.0"})}
     </record>
   </filter>
   <match callhome>

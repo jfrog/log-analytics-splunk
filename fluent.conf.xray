@@ -55,9 +55,9 @@
     enable_ruby true
     <record>
       app_id '251985503'
-      identity 'OnPremObservability-Splunk/1.0.0'
-      event 'splunk-xray-fluent-config'
-      properties ${return({"featureId" => "XrayVersion/" + record["xray_version"]})}
+      identity "#{ENV['JPD_URL']}"
+      event 'splunk-xray-fluentd-config'
+      properties ${return({"featureId" => "XrayVersion/" + record["xray_version"], "productId" => "OnPremObservability-Splunk/1.0.0"})}
     </record>
   </filter>
   <match callhome>
