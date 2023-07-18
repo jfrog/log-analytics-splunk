@@ -222,8 +222,8 @@
   tag jfrog.xray.router.traefik
   <parse>
       @type regexp
-      expression ^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] -(?<message>.+)$
-      time_key timestamp
+      expression ^(?<log_timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] -(?<message>.+)$
+      time_key log_timestamp
       time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
 </source>
@@ -248,8 +248,8 @@
   tag jfrog.xray.xray.request
   <parse>
     @type regexp
-    expression ^(?<timestamp>[^ ]*)\|(?<trace_id>[^ ]*)\|(?<remote_address>[^|]++)\|(?<username>[^\|]*)\|(?<request_method>[^\|]*)\|(?<request_url>[^\|]*)\|(?<return_status>[^\|]*)\|(?<response_content_length>[^\|]*)\|(?<request_duration>.*)$
-    time_key timestamp
+    expression ^(?<log_timestamp>[^ ]*)\|(?<trace_id>[^ ]*)\|(?<remote_address>[^|]++)\|(?<username>[^\|]*)\|(?<request_method>[^\|]*)\|(?<request_url>[^\|]*)\|(?<return_status>[^\|]*)\|(?<response_content_length>[^\|]*)\|(?<request_duration>.*)$
+    time_key log_timestamp
     time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>
 </source>
@@ -283,8 +283,8 @@
     <parse>
         @type multiline
         format_firstline /\d{4}-\d{1,2}-\d{1,2}/
-        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
-        time_key timestamp
+        format1 /^(?<log_timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key log_timestamp
         time_format %Y-%m-%dT%H:%M:%S.%LZ
     </parse>
     emit_invalid_record_to_error false
@@ -295,8 +295,8 @@
     <parse>
         @type multiline
         format_firstline /\d{4}-\d{1,2}-\d{1,2}/
-        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
-        time_key timestamp
+        format1 /^(?<log_timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key log_timestamp
         time_format %Y-%m-%dT%H:%M:%S.%LZ
     </parse>
     emit_invalid_record_to_error false
@@ -307,8 +307,8 @@
     <parse>
         @type multiline
         format_firstline /\d{4}-\d{1,2}-\d{1,2}/
-        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
-        time_key timestamp
+        format1 /^(?<log_timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key log_timestamp
         time_format %Y-%m-%dT%H:%M:%S.%LZ
     </parse>
   </filter>
@@ -318,8 +318,8 @@
     <parse>
         @type multiline
         format_firstline /\d{4}-\d{1,2}-\d{1,2}/
-        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] \[\] -(?<message>.*)$/
-        time_key timestamp
+        format1 /^(?<log_timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] \[\] -(?<message>.*)$/
+        time_key log_timestamp
         time_format %Y-%m-%dT%H:%M:%S.%LZ
     </parse>
   </filter>
@@ -329,8 +329,8 @@
     <parse>
         @type multiline
         format_firstline /\d{4}-\d{1,2}-\d{1,2}/
-        format1 /^(?<timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
-        time_key timestamp
+        format1 /^(?<log_timestamp>[^ ]*) \[(?<service_type>[^\]]*)\] \[(?<log_level>[^\]]*)\] \[(?<trace_id>[^\]]*)\] \[(?<class_line_number>.*)\] \[(?<thread>.*)\] (?<message>.*)$/
+        time_key log_timestamp
         time_format %Y-%m-%dT%H:%M:%S.%LZ
     </parse>
   </filter>
