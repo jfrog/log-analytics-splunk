@@ -233,6 +233,15 @@ Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each o
 #### Artifactory ⎈:
 For Artifactory installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values. 
 
+Create a secret for JFrog's admkin token - [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) using any of the following methods
+```shell
+kubectl create secret generic jfrog-admin-token --from-file=<path_to_license_file>token
+
+OR
+
+kubectl create secret generic jfrog-admin-token --from-literal=token=<JFROG_ADMN_TOKEN>
+```
+
 * **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
 * **SPLUNK_HEC_HOST**: Splunk Instance URL
@@ -242,7 +251,7 @@ For Artifactory installation, download the .env file from [here](https://raw.git
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
 * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
-* **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
+* **JFROG_ADMIN_TOKEN**: For security reasons, this value will be pulled from the secret jfrog-admin-token created in the step above
 * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
 Apply the .env files and then run the helm command below
@@ -262,7 +271,6 @@ helm upgrade --install artifactory  jfrog/artifactory \
        --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
        --set jfrog.observability.jpd_url=$JPD_URL \
        --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
-       --set jfrog.observability.access_token=$JFROG_ADMIN_TOKEN \
        --set jfrog.observability.common_jpd=$COMMON_JPD \
        -f helm/artifactory-values.yaml
 ```
@@ -272,6 +280,14 @@ For HA installation, please create a license secret on your cluster prior to ins
 
 ```text
 kubectl create secret generic artifactory-license --from-file=<path_to_license_file>artifactory.cluster.license 
+```
+Create another secret for JFrog's admin token - [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) using any of the following methods
+```shell
+kubectl create secret generic jfrog-admin-token --from-file=<path_to_license_file>token
+
+OR
+
+kubectl create secret generic jfrog-admin-token --from-literal=token=<JFROG_ADMN_TOKEN>
 ```
 Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values.
 
@@ -284,7 +300,7 @@ Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-a
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
 * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
-* **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
+* **JFROG_ADMIN_TOKEN**: For security reasons, this value will be pulled from the secret jfrog-admin-token created in the step above
 * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
 Apply the .env files and then run the helm command below
@@ -304,13 +320,22 @@ helm upgrade --install artifactory-ha  jfrog/artifactory-ha \
        --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
        --set jfrog.observability.jpd_url=$JPD_URL \
        --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
-       --set jfrog.observability.access_token=$JFROG_ADMIN_TOKEN \
        --set jfrog.observability.common_jpd=$COMMON_JPD \
        -f helm/artifactory-ha-values.yaml
 ```
 
 #### Xray ⎈:
-For Artifactory installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values.
+
+Create a secret for JFrog's admin token - [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) using any of the following methods if it doesn't exist
+```shell
+kubectl create secret generic jfrog-admin-token --from-file=<path_to_license_file>token
+
+OR
+
+kubectl create secret generic jfrog-admin-token --from-literal=token=<JFROG_ADMN_TOKEN>
+```
+
+For Xray installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values.
 
 * **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
@@ -321,7 +346,7 @@ For Artifactory installation, download the .env file from [here](https://raw.git
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
 * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
-* **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
+* **JFROG_ADMIN_TOKEN**: For security reasons, this value will be pulled from the secret jfrog-admin-token created in the step above
 * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
 Apply the .env files and then run the helm command below
@@ -344,7 +369,6 @@ helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=http://my-artifactory
        --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
        --set jfrog.observability.jpd_url=$JPD_URL \
        --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
-       --set jfrog.observability.access_token=$JFROG_ADMIN_TOKEN \
        --set jfrog.observability.common_jpd=$COMMON_JPD \
        -f helm/xray-values.yaml
 ```
