@@ -28,7 +28,10 @@ artifactory:
         - name: JPD_ADMIN_USERNAME
           value: {{ .Values.jfrog.observability.username }}
         - name: JFROG_ADMIN_TOKEN
-          value: {{ .Values.jfrog.observability.access_token }}
+          valueFrom:
+            secretKeyRef:
+              name: jfrog-admin-token
+              key: token
         - name: COMMON_JPD
           value: {{ .Values.jfrog.observability.common_jpd | quote }}
         - name: SPLUNK_COM_PROTOCOL
@@ -56,5 +59,4 @@ jfrog:
   observability:
     jpd_url: JPD_URL
     username: JPD_ADMIN_USERNAME
-    access_token: JFROG_ADMIN_TOKEN
     common_jpd: COMMON_JPD
