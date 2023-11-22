@@ -24,19 +24,19 @@ Install the `JFrog Log Analytics Platform` app from Splunkbase [here!](https://s
 ````text
 1. Download file from Splunkbase
 2. Open Splunk web console as administrator
-3. From homepage click on settings wheel in top right of Apps section
+3. From homepage click on the Manage button with a wheel icon (left side of the screen, in the top right corner of Apps section)
 4. Click on "Install app from file"
 5. Select download file from Splunkbase on your computer
 6. Click upgrade 
 7. Click upload
 ````
 
-Restart Splunk post installation of App.
+Splunk will ask the user to restart to complete the installation. If the app is not restarted automatically, do the following steps:
 
 ````text 
-1. Open Splunk web console as adminstrator
+1. Open Splunk web console as administrator
 2. Click on Settings then Server Controls
-3. Click on Restart 
+3. Click on Restart Splunk 
 ````
 
 Login to Splunk after the restart completes.
@@ -76,7 +76,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Enter a "Name" in the textbox
 6. (Optional) Enter a "Description" in the textbox
 7. Click on the green "Next" button
-8. Select App Context of "JFrog Platform Log Analytics" in the dropdown
+8. Select Source Type "Automatic"
 9. Add "jfrog_splunk" index to store the JFrog platform log data into.
 10. Click on the green "Review" button
 11. If good, Click on the green "Done" button
@@ -92,7 +92,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Enter a "Name" in the textbox
 6. (Optional) Enter a "Description" in the textbox
 7. Click on the green "Next" button
-8. Select App Context of "JFrog Platform Log Analytics" in the dropdown
+8. Select Source Type "Automatic"
 9. Add "jfrog_splunk_metrics" index to store the JFrog platform metrics data into.
 10. Click on the green "Review" button
 11. If good, Click on the green "Done" button
@@ -233,7 +233,7 @@ Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each o
 #### Artifactory ⎈:
 For Artifactory installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values. 
 
-Create a secret for JFrog's admkin token - [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) using any of the following methods
+Create a secret for JFrog's admin token - [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) using any of the following methods
 ```shell
 kubectl create secret generic jfrog-admin-token --from-file=token=<path_to_token_file>
 
