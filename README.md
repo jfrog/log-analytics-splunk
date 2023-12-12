@@ -8,13 +8,14 @@ This integration is last tested with Artifactory 7.55.6 and Xray 3.69.3 versions
 
 `Note! You must follow the order of the steps throughout Splunk Configuration`
 1. [Splunk Setup](#splunk-setup)
-2. [Fluentd Installation](#fluentd-installation)
+2. [JFrog Metrics Setup](#jfrog-metrics-setup)
+3. [Fluentd Installation](#fluentd-installation)
     * [OS / Virtual Machine](#os--virtual-machine)
     * [Docker](#docker)
     * [Kubernetes Deployment with Helm](#kubernetes-deployment-with-helm)
-3. [Dashboards](#dashboards)
-4. [Splunk Demo](#splunk-demo)
-5. [References](#references)
+4. [Dashboards](#dashboards)
+5. [Splunk Demo](#splunk-demo)
+6. [References](#references)
 
 ## Splunk Setup
 
@@ -97,6 +98,20 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 11. Save the generated token value
 ````
 
+## JFrog Metrics Setup
+To enable metrics in Artifactory, make the following configuration changes to the [Artifactory System YAML](https://www.jfrog.com/confluence/display/JFROG/Artifactory+System+YAML)
+```yaml
+artifactory:
+    metrics:
+        enabled: true
+    openMetrics:
+        enabled: true
+```
+Once this configuration is done and the application is restarted, metrics will be available in Open Metrics Format
+
+Metrics are enabled by default in Xray.
+For kubernetes based installs, openMetrics are enabled in the helm install commands listed below
+
 ## Fluentd Installation
 
 ### OS / Virtual Machine
@@ -161,6 +176,7 @@ source .env_jfrog
 ````
 
 ### Docker
+`Note! These steps were not tested to work out of the box on MAC`
 In order to run fluentd as a docker image to send the logs, violations and metrics data to splunk, the following commands needs to be executed on the host that runs the docker.
 
 1. Check the docker installation is functional, execute command 'docker version' and 'docker ps'.
