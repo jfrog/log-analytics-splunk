@@ -76,11 +76,10 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Enter a "Name" in the textbox
 6. (Optional) Enter a "Description" in the textbox
 7. Click on the green "Next" button
-8. Select App Context of "JFrog Platform Log Analytics" in the dropdown
-9. Add "jfrog_splunk" index to store the JFrog platform log data into.
-10. Click on the green "Review" button
-11. If good, Click on the green "Done" button
-12. Save the generated token value
+8. Add "jfrog_splunk" index to store the JFrog platform log data into.
+9. Click on the green "Review" button
+10. If good, Click on the green "Done" button
+11. Save the generated token value
 ````
 
 #### Configure new HEC token to receive Metrics
@@ -92,11 +91,10 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Enter a "Name" in the textbox
 6. (Optional) Enter a "Description" in the textbox
 7. Click on the green "Next" button
-8. Select App Context of "JFrog Platform Log Analytics" in the dropdown
-9. Add "jfrog_splunk_metrics" index to store the JFrog platform metrics data into.
-10. Click on the green "Review" button
-11. If good, Click on the green "Done" button
-12. Save the generated token value
+8. Add "jfrog_splunk_metrics" index to store the JFrog platform metrics data into.
+9. Click on the green "Review" button
+10. If good, Click on the green "Done" button
+11. Save the generated token value
 ````
 
 ## Fluentd Installation
@@ -133,7 +131,7 @@ Ensure you have access to the Internet from VM. Recommended install is through f
 
 After FluentD is successfully installed, the below plugins are required to be installed
 
-````text
+````shell
 gem install fluent-plugin-concat
 gem install fluent-plugin-splunk-hec
 gem install fluent-plugin-jfrog-siem
@@ -157,7 +155,7 @@ We rely heavily on environment variables so that the correct log files are strea
 
 Apply the .env files and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
 
-````text
+````shell
 source .env_jfrog
 ./fluentd $JF_PRODUCT_DATA_INTERNAL/fluent.conf.<product_name>
 ````
@@ -223,7 +221,7 @@ Recommended installation for Kubernetes is to utilize the helm chart with the as
 
 Add JFrog Helm repository:
 
-```text
+```shell
 helm repo add jfrog https://charts.jfrog.io
 helm repo update
 ```
@@ -231,49 +229,69 @@ Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each o
 ``openssl rand -hex 32``
 
 #### Artifactory ⎈:
-For Artifactory installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values. 
 
-Create a secret for JFrog's admkin token - [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) using any of the following methods
-```shell
-kubectl create secret generic jfrog-admin-token --from-file=token=<path_to_token_file>
+1. Skip this step if you already have Artifactory installed. Else, install Artifactory using the command below
+    ```shell
+    helm upgrade --install artifactory  jfrog/artifactory \
+           --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+           --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+           --set artifactory.license.secret=artifactory-license \
+           --set artifactory.license.dataKey=artifactory.cluster.license \
+           --set artifactory.metrics.enabled=true \
+           --set artifactory.openMetrics.enabled=true
+    ```
 
-OR
+2. Create a secret for JFrog's admin token - [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) using any of the following methods
+    ```shell
+    kubectl create secret generic jfrog-admin-token --from-file=token=<path_to_token_file>
+    
+    OR
+    
+    kubectl create secret generic jfrog-admin-token --from-literal=token=<JFROG_ADMN_TOKEN>
+    ```
+3. For Artifactory installation, download the .env file from [here](https://github.com/jfrog/log-analytics-splunk/raw/master/helm/.env_jfrog_helm). Fill in the .env_jfrog_helm file with correct values.
 
-kubectl create secret generic jfrog-admin-token --from-literal=token=<JFROG_ADMN_TOKEN>
-```
+   * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
+   * **SPLUNK_HEC_HOST**: Splunk Instance URL
+   * **SPLUNK_HEC_PORT**: Splunk HEC configured port
+   * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
+   * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+   * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+   * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
+   * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
+   * **JFROG_ADMIN_TOKEN**: For security reasons, this value will be pulled from the secret jfrog-admin-token created in the step above
+   * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
 
-* **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
-* **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
-* **SPLUNK_HEC_HOST**: Splunk Instance URL
-* **SPLUNK_HEC_PORT**: Splunk HEC configured port
-* **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
-* **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
-* **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
-* **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
-* **JPD_ADMIN_USERNAME**: Artifactory username for authentication
-* **JFROG_ADMIN_TOKEN**: For security reasons, this value will be pulled from the secret jfrog-admin-token created in the step above
-* **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+    Apply the .env files using the helm command below
 
-Apply the .env files and then run the helm command below
+    ````shell
+    source .env_jfrog_helm
+    ````
 
-````text
-source .env_jfrog
-````
-```text
-helm upgrade --install artifactory  jfrog/artifactory \
-       --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
-       --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
-       --set splunk.host=$SPLUNK_HEC_HOST \
-       --set splunk.port=$SPLUNK_HEC_PORT \
-       --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
-       --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
-       --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
-       --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
-       --set jfrog.observability.jpd_url=$JPD_URL \
-       --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
-       --set jfrog.observability.common_jpd=$COMMON_JPD \
-       -f helm/artifactory-values.yaml
-```
+4. Postgres password is required to upgrade Artifactory. Run the following command to get the current password
+   ```shell
+   POSTGRES_PASSWORD=$(kubectl get secret artifactory-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
+   ```
+
+5. Upgrade Artifactory installation using the command below
+    ```shell
+    helm upgrade --install artifactory jfrog/artifactory \
+           --set artifactory.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
+           --set artifactory.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
+           --set artifactory.metrics.enabled=true --set artifactory.openMetrics.enabled=true \
+           --set databaseUpgradeReady=true --set postgresql.postgresqlPassword=$POSTGRES_PASSWORD --set nginx.service.ssloffload=true \
+           --set splunk.host=$SPLUNK_HEC_HOST \
+           --set splunk.port=$SPLUNK_HEC_PORT \
+           --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
+           --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
+           --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
+           --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
+           --set jfrog.observability.jpd_url=$JPD_URL \
+           --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
+           --set jfrog.observability.access_token=$JFROG_ADMIN_TOKEN \
+           --set jfrog.observability.common_jpd=$COMMON_JPD \
+           -f helm/artifactory-values.yaml
+    ```
 
 #### Artifactory-HA ⎈:
 For HA installation, please create a license secret on your cluster prior to installation.
@@ -291,7 +309,6 @@ kubectl create secret generic jfrog-admin-token --from-literal=token=<JFROG_ADMN
 ```
 Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values.
 
-* **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
 * **SPLUNK_HEC_HOST**: Splunk Instance URL
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
@@ -337,7 +354,6 @@ kubectl create secret generic jfrog-admin-token --from-literal=token=<JFROG_ADMN
 
 For Xray installation, download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog). Fill in the .env_jfrog file with correct values.
 
-* **JF_PRODUCT_DATA_INTERNAL**: Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
 * **SPLUNK_HEC_HOST**: Splunk Instance URL
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
