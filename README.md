@@ -2,7 +2,7 @@
 
 ## Versions Supported
 
-This integration is last tested with Artifactory 7.55.6 and Xray 3.69.3 versions.
+This integration is last tested with Artifactory 7.71.11 and Xray 3.88.12 versions.
 
 ## Table of Contents
 
@@ -303,7 +303,6 @@ Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each o
            --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
            --set jfrog.observability.jpd_url=$JPD_URL \
            --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
-           --set jfrog.observability.access_token=$JFROG_ADMIN_TOKEN \
            --set jfrog.observability.common_jpd=$COMMON_JPD \
            -f helm/artifactory-values.yaml
     ```
@@ -367,7 +366,6 @@ Replace placeholders with your ``masterKey`` and ``joinKey``. To generate each o
        --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
        --set jfrog.observability.jpd_url=$JPD_URL \
        --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
-       --set jfrog.observability.access_token=$JFROG_ADMIN_TOKEN \
        --set jfrog.observability.common_jpd=$COMMON_JPD \
        -f helm/artifactory-ha-values.yaml
    ```
@@ -398,13 +396,13 @@ For Xray installation, download the .env file from [here](https://raw.githubuser
 
 Apply the .env files and then run the helm command below
 
-````text
+````shell
 source jfrog_helm.env
 ````
 
 Use the same `joinKey` as you used in Artifactory installation to allow Xray node to successfully connect to Artifactory.
 
-```text
+```shell
 helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=http://my-artifactory-nginx-url \
        --set xray.masterKey=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF \
        --set xray.joinKey=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE \
