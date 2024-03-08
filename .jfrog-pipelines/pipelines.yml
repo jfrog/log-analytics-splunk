@@ -1,0 +1,46 @@
+resources:
+  - name: partnership_git_repo
+    type: GitRepo
+    configuration:
+      gitProvider: partnership_github
+      path: jfrog/log-analytics-splunk
+      branches:
+        include: ^gitBranch$
+
+  - name: image_res
+    type: Image
+    configuration:
+      autoPull: false
+      sourceRepository: pts-observability
+      registry: PartnershipArtifactory
+      imageName: partnership-pts-observability.jfrog.io/fluentd
+      imageTag: '4.1'
+
+pipelines:
+  - name: dockerbuild_fluentd
+    configuration:
+      jfrogCliVersion: 2
+    steps:
+      - name: docker_build
+        type: DockerBuild
+        configuration:
+          affinityGroup: DockerBuildAndPush
+          dockerFileLocation: fluentd-installer
+          dockerFileName: Dockerfile.fluentd.sidecar
+          dockerImageName: partnership-pts-observability.jfrog.io/fluentd
+          dockerImageTag: '4.1'
+          inputResources:
+            - name: partnership_git_repo
+          integrations:
+            - name: PartnershipArtifactory
+
+      - name: docker_push
+        type: DockerPush
+        configuration:
+          affinityGroup: DockerBuildAndPush
+          integrations:
+            - name: PartnershipArtifactory
+          inputSteps:
+            - name: docker_build
+          outputResources:
+            - name: image_res
