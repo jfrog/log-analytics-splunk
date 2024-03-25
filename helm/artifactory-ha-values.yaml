@@ -1,4 +1,4 @@
-installerInfo: '{ "productId": "OnPremObservability-Splunk/1.0.0", "features": [ { "featureId": "ArtifactoryVersion/{{ default .Chart.AppVersion .Values.artifactory.image.version }}" }, { "featureId": "{{ if .Values.postgresql.enabled }}postgresql{{ else }}{{ .Values.database.type }}{{ end }}/0.0.0" }, { "featureId": "Platform/{{ default "kubernetes" .Values.installer.platform }}" },  { "featureId": "Channel/OnPremObservability-Splunk-Helm" } ] }'
+installerInfo: '{ "productId": "OnPremObservability-Splunk/1.0.1", "features": [ { "featureId": "ArtifactoryVersion/{{ default .Chart.AppVersion .Values.artifactory.image.version }}" }, { "featureId": "{{ if .Values.postgresql.enabled }}postgresql{{ else }}{{ .Values.database.type }}{{ end }}/0.0.0" }, { "featureId": "Platform/{{ default "kubernetes" .Values.installer.platform }}" },  { "featureId": "Channel/OnPremObservability-Splunk-Helm" } ] }'
 artifactory:
   customInitContainersBegin: |
     - name: "prepare-fluentd-conf-on-persistent-volume"
@@ -15,7 +15,7 @@ artifactory:
           name: volume
   customSidecarContainers: |
     - name: "artifactory-fluentd-sidecar"
-      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.0"
+      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.1"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"

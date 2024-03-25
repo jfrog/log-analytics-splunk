@@ -1,5 +1,5 @@
 # Dockerfile for bitnami/fluentd sidecar image with all the necessary plugins for our log analytic providers
-FROM bitnami/fluentd:1.15.2
+FROM bitnami/fluentd:1.16.3
 LABEL maintainer="Partner Engineering <partner_support@jfrog.com>"
 
 ## Build time Arguments, short circuit them to ENV Variables so they are available at run time also
