@@ -2,6 +2,10 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.2] - April 11th, 2024
+
+* Fix Artifactory access's regex to match log input changes
+
 ## [1.0.1] - March 22nd, 2024
 
 * Updated docker images to use fluetnd:1.16.3 to resolve existing CVEs. Please see [security section](https://github.com/jfrog/log-analytics-splunk/security) for more info
