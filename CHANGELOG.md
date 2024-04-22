@@ -2,6 +2,10 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.3] - April 22, 2024
+
+* Fix order of request and response content length to match spec
+
 ## [1.0.2] - April 11th, 2024
 
 * Fix Artifactory access's regex to match log input changes
