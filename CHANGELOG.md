@@ -2,6 +2,10 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.4] - May 31, 2024
+* [BREAKING] Adding deprecation notice for partnership-pts-observability.jfrog.io docker registry
+* FluentD sidecar version bumped to 4.3, to upgrade base image to bitnami/fluentd 1.16.5
+
 ## [1.0.3] - April 22, 2024
 
 * Fix order of request and response content length to match spec
