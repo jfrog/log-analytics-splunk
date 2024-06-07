@@ -2,7 +2,7 @@ installerInfo: '{ "productId": "OnPremObservability-Splunk/1.0.1", "features": [
 artifactory:
   customInitContainersBegin: |
     - name: "prepare-fluentd-conf-on-persistent-volume"
-      image: "{{ .Values.initContainerImage }}"
+      image: {{ include "artifactory.getImageInfoByValue" (list . "initContainers") }}
       imagePullPolicy: "{{ .Values.artifactory.image.pullPolicy }}"
       command:
         - 'sh'
