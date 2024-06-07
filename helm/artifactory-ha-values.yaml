@@ -2,7 +2,7 @@ installerInfo: '{ "productId": "OnPremObservability-Splunk/1.0.1", "features": [
 artifactory:
   customInitContainersBegin: |
     - name: "prepare-fluentd-conf-on-persistent-volume"
-      image: "{{ .Values.initContainerImage }}"
+      image: {{ include "artifactory.getImageInfoByValue" (list . "initContainers") }}
       imagePullPolicy: "{{ .Values.artifactory.image.pullPolicy }}"
       command:
         - 'sh'
@@ -15,7 +15,7 @@ artifactory:
           name: volume
   customSidecarContainers: |
     - name: "artifactory-fluentd-sidecar"
-      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.1"
+      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.3"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"

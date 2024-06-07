@@ -235,6 +235,10 @@ Recommended installation for Kubernetes is to utilize the helm chart with the as
 | Artifactory HA | helm/artifactory-ha-values.yaml |
 | Xray           | helm/xray-values.yaml           |
 
+> [!WARNING]
+> 
+> The old docker registry `partnership-pts-observability.jfrog.io`, which contains older versions of this integration is now deprecated. We'll keep the existing docker images on this old registry until August 1st, 2024. After that date, this registry will no longer be available. Please `helm upgrade` your JFrog kubernetes deployment in order to pull images as specified on the above helm value files, from the new `releases-pts-observability-fluentd.jfrog.io` registry. Please do so in order to avoid `ImagePullBackOff` errors in your deployment once this registry is gone.
+
 Add JFrog Helm repository:
 
 ```shell

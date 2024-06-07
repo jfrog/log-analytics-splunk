@@ -6,7 +6,7 @@ replicaCount: 1
 common:
   customInitContainersBegin: |
     - name: "prepare-fluentd-conf-on-persistent-volume"
-      image: "{{ .Values.initContainerImage }}"
+      image: {{ include "xray.getImageInfoByValue" (list . "initContainers") }}
       imagePullPolicy: "{{ .Values.imagePullPolicy }}"
       command:
         - 'sh'
@@ -19,7 +19,7 @@ common:
           name: data-volume
   customSidecarContainers: |
     - name: "xray-platform-fluentd-sidecar"
-      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.1"
+      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.3"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
