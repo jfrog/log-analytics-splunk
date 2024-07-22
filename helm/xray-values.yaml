@@ -19,7 +19,7 @@ common:
           name: data-volume
   customSidecarContainers: |
     - name: "xray-platform-fluentd-sidecar"
-      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.3"
+      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.5"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.xray.persistence.mountPath }}"
@@ -28,7 +28,7 @@ common:
         - name: JF_PRODUCT_DATA_INTERNAL
           value: {{ .Values.xray.persistence.mountPath }}
         - name: FLUENTD_CONF
-          value: ../../../../{{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf
+          value: ../../../..{{ .Values.xray.persistence.mountPath }}/etc/fluentd/fluentd.conf
         - name: JPD_URL
           value: {{ .Values.jfrog.observability.jpd_url }}
         - name: JPD_ADMIN_USERNAME
