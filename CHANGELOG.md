@@ -2,12 +2,18 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.6] - August 8, 2024
+
+* Fix metrics configuration due to deprication of `artifactory.openMetrics` as part of Artifactory 7.87.x charts and renaming it to `artifactory.metrics`
+
 ## [1.0.5] - July 22, 2024
+
 * FluentD sidecar version bumped to 4.5, to upgrade base image to bitnami/fluentd 1.17.0
 * Fixing metrics documentation and general readme fixes
 * Remove elastic search fluentd plugins from docker images
 
 ## [1.0.4] - June6, 2024
+
 * [BREAKING] Adding deprecation notice for partnership-pts-observability.jfrog.io docker registry
 * FluentD sidecar version bumped to 4.3, to upgrade base image to bitnami/fluentd 1.16.5
 * Update FluentD sidecar helm charts to match recent changes in JFrog's official charts
