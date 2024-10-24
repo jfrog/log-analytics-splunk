@@ -2,6 +2,13 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.7] - October 25, 2024
+
+* Add support for metrics and logs outbound payload compression, with `gzip_compression` FluentD param as part of `fluent-plugin-jfrog-sent-metrics` and `fluent-plugin-splunk-hec` plugins
+* Add support for a configurable http request timeout, with `request_timeout` FluentD param as part of `fluent-plugin-jfrog-metrics` and `fluent-plugin-jfrog-sent-metrics` plugins
+* Add support for a configurable `verify_ssl` FluentD param as part of `fluent-plugin-jfrog-metrics`
+* FluentD sidecar version bumped to 4.9, to incorporate the above changes
+
 ## [1.0.6] - August 8, 2024
 
 * Fix metrics configuration due to deprication of `artifactory.openMetrics` as part of Artifactory 7.87.x charts and renaming it to `artifactory.metrics`
