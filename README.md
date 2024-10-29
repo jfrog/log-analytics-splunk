@@ -176,7 +176,9 @@ We rely heavily on environment variables so that the correct log files are strea
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
 * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
 * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
-* **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme.
+* **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+* **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
+* **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk
 * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
 * **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
@@ -226,7 +228,9 @@ For Splunk as the observability platform, execute these commands to setup the do
    **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
    **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
    **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
-   **JPD_URL: Artifactory JPD URL of the format `http://<ip_address>`
+   **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
+   **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics payloads that are sent to Splunk
+   **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
    **JPD_ADMIN_USERNAME**: Artifactory username for authentication
    **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
    **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
@@ -316,6 +320,8 @@ export MASTER_KEY=$(openssl rand -hex 32)
    * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
    * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
    * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+   * **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
+   * **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk
    * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
    * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
    * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
@@ -340,8 +346,10 @@ export MASTER_KEY=$(openssl rand -hex 32)
           --set splunk.port=$SPLUNK_HEC_PORT \
           --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
           --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
+          --set splunk.compress_data=$SPLUNK_COMPRESS_DATA \
           --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
           --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
+          --set splunk.verify_ssl=$SPLUNK_VERIFY_SSL \
           --set jfrog.observability.jpd_url=$JPD_URL \
           --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
           --set jfrog.observability.common_jpd=$COMMON_JPD \
@@ -386,6 +394,8 @@ export MASTER_KEY=$(openssl rand -hex 32)
    * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
    * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
    * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+   * **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
+   * **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk
    * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
    * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
    * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
@@ -412,6 +422,8 @@ export MASTER_KEY=$(openssl rand -hex 32)
         --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
         --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
         --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
+        --set splunk.verify_ssl=$SPLUNK_VERIFY_SSL \
+        --set splunk.compress_data=$SPLUNK_COMPRESS_DATA \
         --set jfrog.observability.jpd_url=$JPD_URL \
         --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
         --set jfrog.observability.common_jpd=$COMMON_JPD \
@@ -439,6 +451,8 @@ For Xray installation, download the .env file from [here](https://raw.githubuser
 * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
 * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+* **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
+* **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk
 * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
 * **JFROG_ADMIN_TOKEN**: For security reasons, this value will be pulled from the secret jfrog-admin-token created in the step above
@@ -468,6 +482,8 @@ helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=$JPD_URL \
     --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
     --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
     --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
+    --set splunk.verify_ssl=$SPLUNK_VERIFY_SSL \
+    --set splunk.compress_data=$SPLUNK_COMPRESS_DATA \
     --set jfrog.observability.jpd_url=$JPD_URL \
     --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
     --set jfrog.observability.common_jpd=$COMMON_JPD \

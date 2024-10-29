@@ -18,7 +18,7 @@ artifactory:
           name: volume
   customSidecarContainers: |
     - name: "artifactory-fluentd-sidecar"
-      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.5"
+      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.9"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
@@ -49,6 +49,10 @@ artifactory:
           value: {{ .Values.splunk.logs_token }}
         - name: SPLUNK_INSECURE_SSL
           value: {{ .Values.splunk.insecure_ssl | quote}}
+        - name: SPLUNK_VERIFY_SSL
+          value: {{ .Values.splunk.verify_ssl | quote}}  
+        - name: SPLUNK_COMPRESS_DATA
+          value: {{ .Values.splunk.compress_data | quote}}
         - name: FLUENTD_CONF
           value: ../../../..{{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
 splunk:
@@ -58,6 +62,8 @@ splunk:
   metrics_token: SPLUNK_METRICS_HEC_TOKEN
   com_protocol: SPLUNK_COM_PROTOCOL
   insecure_ssl: SPLUNK_INSECURE_SSL
+  verify_ssl: SPLUNK_VERIFY_SSL
+  compress_data: SPLUNK_COMPRESS_DATA
 jfrog:
   observability:
     jpd_url: JPD_URL

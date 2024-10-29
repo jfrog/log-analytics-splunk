@@ -4,7 +4,6 @@
 Install the app in your Splunk instance. Then restart your Splunk instance by going to _Server Controls > Restart_.
 
 ## Splunk Setup
-
 1. Create new Events index `jfrog_splunk` at _Settings > Indexes > New Index > Save_
 2. Create new Metrics index `jfrog_splunk_metrics` at _Settings > Indexes > New Index > Metrics > Save_
 3. Create a new HTTP Event Collector data input for logs at _Settings > Data Inputs > HTTP Event Collector > New Token > jfrog_splunk index > Save_
@@ -13,7 +12,7 @@ Install the app in your Splunk instance. Then restart your Splunk instance by go
 ## Setup Fluentd
 FluentD is used to send log events to Splunk. This [repo](https://github.com/jfrog/log-analytics-splunk) contains instructions on various installations options for Fluentd as a logging agent. 
 
-Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/.env_jfrog) and fill in the .env_jfrog file with Splunk and JPD information
+Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/jfrog.env) and fill in the jfrog.env file with Splunk and JPD information
 
 ```
 export JF_PRODUCT_DATA_INTERNAL=JF_PRODUCT_DATA_INTERNAL
@@ -23,19 +22,23 @@ export SPLUNK_HEC_PORT=8088
 export SPLUNK_HEC_TOKEN=SPLUNK_HEC_TOKEN
 export SPLUNK_METRICS_HEC_TOKEN=SPLUNK_METRICS_HEC_TOKEN
 export SPLUNK_INSECURE_SSL=false
+export SPLUNK_VERIFY_SSL=true
+export SPLUNK_COMPRESS_DATA=true
 export JPD_URL=http://abc.jfrog.io
 export JPD_ADMIN_USERNAME=admin
 export JFROG_ADMIN_TOKEN=JFROG_ADMIN_TOKEN
 export COMMON_JPD=false
 ```
 
-* **JF_PRODUCT_DATA_INTERNAL**: This environment variable must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory. Helm based installs will already have this defined based upon the underlying docker images. Not a required field for k8s installation
+* **JF_PRODUCT_DATA_INTERNAL**: The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
 * **SPLUNK_HEC_HOST**: Splunk Instance URL
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
 * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
 * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
+* **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
+* **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk
 * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
 * **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
@@ -71,5 +74,4 @@ Log data from JFrog platform logs is translated to pre-defined Common Informatio
 ```
 
 ## Additional Setup
-
 For complete instructions on setup of the integration between JFrog Artifactory & Xray to Splunk visit our Github [repo](https://github.com/jfrog/log-analytics-splunk)

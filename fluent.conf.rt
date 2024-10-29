@@ -3,12 +3,14 @@
   @type jfrog_metrics
   @id metrics_http_jfrt
   tag jfrog.metrics.artifactory
-  interval 5s
+  execution_interval 60s
   metric_prefix 'jfrog.artifactory'
   jpd_url "#{ENV['JPD_URL']}"
   username "#{ENV['JPD_ADMIN_USERNAME']}"
   token "#{ENV['JFROG_ADMIN_TOKEN']}"
   common_jpd "#{ENV['COMMON_JPD']}"
+  # request_timeout 30s
+  # verify_ssl "#{ENV['SPLUNK_VERIFY_SSL']}"
 </source>
 # SPLUNK ARTIFACTORY METRICS OUTPUT
 <match jfrog.metrics.**>
@@ -24,9 +26,10 @@
   metric_name_key metric_name
   metric_value_key value
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
+  gzip_compression "#{ENV['SPLUNK_COMPRESS_DATA']}"
 </match>
 
-# ALL CALLHOME
+# CALLHOME
 <source>
   @type exec
   tag callhome
@@ -256,7 +259,6 @@
   </parse>
 </source>
 
-
 # FILTER DIRECTIVE
 ## ALL LOGS
 <filter **>
@@ -397,6 +399,7 @@
     sourcetype_key log_source
     use_fluentd_time false
     insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
+    gzip_compression "#{ENV['SPLUNK_COMPRESS_DATA']}"
     # ssl parameter
     # use_ssl true
     # ca_file /path/to/ca.pem
