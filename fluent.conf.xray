@@ -9,6 +9,7 @@
   username "#{ENV['JPD_ADMIN_USERNAME']}"
   token "#{ENV['JFROG_ADMIN_TOKEN']}"
   common_jpd "#{ENV['COMMON_JPD']}"
+  # @log_level debug
   # request_timeout 30s
   # verify_ssl "#{ENV['SPLUNK_VERIFY_SSL']}"
 </source>

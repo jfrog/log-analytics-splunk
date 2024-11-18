@@ -2,6 +2,10 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.9] - November 25, 2024
+
+* FluentD sidecar image version bumped to 4.14, to reflect logging improvements in `jfrog_metrics` FluentD plugin
+
 ## [1.0.8] - November 7, 2024
 
 * FluentD sidecar image version bumped to 4.13, to reflect changes in `jfrog_siem` and `jfrog_send_metrics` FluentD plugins 
