@@ -27,19 +27,19 @@ Install the `JFrog Log Analytics Platform` app from Splunkbase [here!](https://s
 ```text
 1. Download file from Splunkbase
 2. Open Splunk web console as administrator
-3. From homepage click on settings wheel in top right of Apps section
+3. From homepage click on the Manage button with a wheel icon (left side of the screen, in the top right corner of Apps section)
 4. Click on "Install app from file"
 5. Select download file from Splunkbase on your computer
 6. Click upgrade 
 7. Click upload
 ```
 
-Restart Splunk post installation of App.
+Splunk will ask the user to restart to complete the installation. If the app is not restarted automatically, do the following steps:
 
 ```text
 1. Open Splunk web console as administrator
 2. Click on Settings then Server Controls
-3. Click on Restart 
+3. Click on Restart Splunk
 ```
 
 Login to Splunk after the restart completes.
