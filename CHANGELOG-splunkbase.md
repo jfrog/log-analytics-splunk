@@ -1,3 +1,8 @@
+## [1.2.8] - December 10th, 2024
+* Update docker panels to mach new log lines structure
+* Add `check_meta_default_write_access` to the app configuration
+* Update some Artifactory metrics in dashboards to point to the observability Open Metrics source (jfob)
+
 ## [1.2.7] - Jun 6th, 2023
 * Verified dashboard widget queries for Artifactory and Xray dashboards
 * Updated documentation to setup JFrog Splunk Integration
