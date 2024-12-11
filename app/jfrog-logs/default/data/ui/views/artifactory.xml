@@ -188,8 +188,8 @@
       <chart>
         <title>Docker Repositories Cache Hit Ratio</title>
         <search>
-          <query>`default_index` $docker_control$  (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") action_response="ACCEPTED DOWNLOAD"  "list\.manifest"
-            | stats count as aCount | appendcols [search (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") action_response="ACCEPTED DEPLOY"  "list\.manifest" "*-cache" | stats count as bCount ]  | eval pct=bCount/aCount | eval inversePct=1-pct | fields - aCount,bCount,pct</query>
+          <query>`default_index` $docker_control$  (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") action_response="ACCEPTED DOWNLOAD"  "manifest.json"
+            | stats count as aCount | appendcols [search `default_index` $docker_control$ (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") action_response="ACCEPTED DEPLOY"  "list\.manifest" "*-cache" | stats count as bCount ]  | eval pct=bCount/aCount | eval inversePct=1-pct | fields - aCount,bCount,inversePct</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -206,7 +206,7 @@
       <chart>
         <title>Dockerhub Pull Requests in rolling 6 Hr window</title>
         <search>
-          <query>`default_index` $docker_control$  "downloading" (log_source="jfrog.rt.artifactory.service" OR sourcetype="jfrog.rt.artifactory.service") "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart span=1h count(message) as Count | streamstats sum(Count) as Count window=6 | eval warning = 100 | eval critical = 200</query>
+          <query>`default_index` $docker_control$  "downloading" (log_source="jfrog.rt.artifactory.service" OR sourcetype="jfrog.rt.artifactory.service") "manifests/" "docker.io" | spath message | search message !="*/manifests/sha256:*" | timechart span=1h count(message) as Count | streamstats sum(Count) as Count window=6</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -242,7 +242,7 @@
       <chart>
         <title>Top 10 Users By Docker Pulls</title>
         <search>
-          <query>`default_index` $docker_control$ (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") "list\.manifest" "ACCEPTED DEPLOY" | top limit=10 username</query>
+          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*/manifests/*" request_method=HEAD | top limit=10 username</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -258,7 +258,7 @@
       <chart>
         <title>Top 10 IPs By Docker Pulls</title>
         <search>
-          <query>`default_index` $docker_control$  (log_source="jfrog.rt.artifactory.access" OR sourcetype="jfrog.rt.artifactory.access") "list\.manifest" "ACCEPTED DEPLOY" | top limit=10 ip</query>
+          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*/manifests/*" request_method=HEAD | top limit=10 remote_address</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -275,7 +275,7 @@
       <chart>
         <title>Accessed Images</title>
         <search>
-          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*" repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" | timechart count by image</query>
+          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*/manifests/*" (request_method=HEAD OR request_method=PUT OR request_method=DELETE) repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" | timechart count by image</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -291,7 +291,7 @@
       <chart>
         <title>Accessed Repos</title>
         <search>
-          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*" repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" | timechart count by repo</query>
+          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*/manifests/*" (request_method=HEAD OR request_method=PUT OR request_method=DELETE) repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" | timechart count by repo</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -309,7 +309,7 @@
       <chart>
         <title>Data Transfers (GBs) Uploads By Repo</title>
         <search>
-          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*" repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" | eval gb=response_content_length/1073741824 | stats sum(gb) as GB by repo | where GB &gt; 0</query>
+          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*/uploads/*" repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" request_method=PATCH | eval gb=request_content_length/1073741824 | stats sum(gb) by repo</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -325,7 +325,7 @@
       <chart>
         <title>Data Transfers (GBs) Downloads By Repo</title>
         <search>
-          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") request_url="/api/docker/*" repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" | eval gb=request_content_length/1073741824 | stats sum(gb) by repo</query>
+          <query>`default_index` $docker_control$ (sourcetype="jfrog.rt.artifactory.request" OR log_source="jfrog.rt.artifactory.request") (request_url="/api/docker/*/blobs/*" OR request_url="/api/docker/*/manifests/*") repo!="NULL" image!="NULL" repo!="" image!="" repo!="latest" (request_method=HEAD OR equest_method=GET) | eval gb=response_content_length/1073741824 | stats sum(gb) by repo</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
@@ -406,94 +406,90 @@
       </chart>
     </panel>
   </row>
-
   <row id="metrics_01">
     <panel>
       <chart>
         <title>CPU Usage</title>
         <search>
-            <query>| mstats avg("jfrog.artifactory.sys_cpu_ratio") AS cpu_ratio prestats=false WHERE `default_metrics_index` $mstats_span$
+          <query>| mstats avg("jfrog.artifactory.jfob_sys_cpu_ratio") AS cpu_ratio prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval cpu_pct = (cpu_ratio * 100)
                    | timechart avg(cpu_pct) AS "CPU %" $timechart_span$
-                   | fields - _span*
-            </query>
+                   | fields - _span*</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
-        <option name="charting.drilldown">none</option>
+        <option name="charting.axisY.abbreviation">auto</option>
         <option name="charting.chart">line</option>
         <option name="charting.chart.nullValueMode">gaps</option>
         <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
         <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
-        <option name="charting.gridLinesX.showMajorLines">true</option>
-        <option name="charting.axisY.abbreviation">auto</option>
-        <option name="charting.legend.mode">seriesCompare</option>
         <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
         <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
       </chart>
     </panel>
   </row>
-
   <row id="metrics_02">
     <panel>
       <chart>
         <title>System Memory</title>
         <search>
-            <query>| mstats avg("jfrog.artifactory.sys_memory_used_bytes") AS avg_used, avg("jfrog.artifactory.sys_memory_free_bytes") AS avg_free prestats=false WHERE `default_metrics_index` $mstats_span$
+          <query>| mstats avg("jfrog.artifactory.jfob_sys_memory_used_bytes") AS avg_used, avg("jfrog.artifactory.jfob_sys_memory_free_bytes") AS avg_free prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval mem_used_gb = (avg_used / 1024 / 1024 / 1024), mem_free_gb = (avg_free / 1024 / 1024 / 1024)
                    | timechart avg(mem_used_gb) AS "Sys Used(GB)", avg(mem_free_gb) AS "Sys Free(GB)" $timechart_span$
-                   | fields - _span*
-            </query>
+                   | fields - _span*</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
-        <option name="charting.drilldown">none</option>
+        <option name="charting.axisY.abbreviation">auto</option>
         <option name="charting.chart">line</option>
         <option name="charting.chart.nullValueMode">gaps</option>
         <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
         <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
-        <option name="charting.gridLinesX.showMajorLines">true</option>
-        <option name="charting.axisY.abbreviation">auto</option>
-        <option name="charting.legend.mode">seriesCompare</option>
         <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
         <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
       </chart>
     </panel>
   </row>
-
   <row id="metrics_03">
     <panel>
       <chart>
         <title>Disk Usage</title>
         <search>
-            <query>| mstats avg("jfrog.artifactory.app_disk_free_bytes") AS avg_disk_free, avg("jfrog.artifactory.app_disk_used_bytes") AS avg_disk_used, avg("jfrog.artifactory.jfrt_storage_current_total_size_bytes") AS avg_disk_tot prestats=false WHERE `default_metrics_index` $mstats_span$
+          <query>| mstats avg("jfrog.artifactory.jfob_app_disk_free_bytes") AS avg_disk_free, avg("jfrog.artifactory.jfob_app_disk_used_bytes") AS avg_disk_used, avg("jfrog.artifactory.jfrt_storage_current_total_size_bytes") AS avg_disk_tot prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval disk_free_gb = (avg_disk_free / 1024 / 1024 / 1024), disk_used_gb = (avg_disk_used / 1024 / 1024 / 1024), disk_tot_gb =  (avg_disk_tot/ 1024 / 1024 / 1024)
                    | timechart avg(disk_free_gb) AS "Disk Free(GB)", avg(disk_used_gb) AS "Disk Used(GB)", avg(disk_tot_gb) AS "Disk Total(GB)" $timechart_span$
-                   | fields - _span*
-            </query>
+                   | fields - _span*</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
-        <option name="charting.drilldown">none</option>
+        <option name="charting.axisY.abbreviation">auto</option>
         <option name="charting.chart">line</option>
         <option name="charting.chart.nullValueMode">gaps</option>
         <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.drilldown">none</option>
         <option name="charting.fieldColors">{"Avg":"#1e93c6"}</option>
-        <option name="charting.gridLinesX.showMajorLines">true</option>
-        <option name="charting.axisY.abbreviation">auto</option>
-        <option name="charting.legend.mode">seriesCompare</option>
         <option name="charting.fieldDashStyles">{"Avg":"solid"}</option>
+        <option name="charting.gridLinesX.showMajorLines">1</option>
+        <option name="charting.legend.mode">seriesCompare</option>
         <option name="displayview">analytics_workspace</option>
+        <option name="refresh.display">progressbar</option>
       </chart>
     </panel>
   </row>
-
   <row id="metrics_04">
     <panel>
       <chart>
         <title>Heap Memory</title>
         <search>
-            <query>| mstats avg("jfrog.artifactory.jfrt_runtime_heap_processors_total") AS heap_processors , avg("jfrog.artifactory.jfrt_runtime_heap_freememory_bytes") AS avg_heap_free_bytes, avg("jfrog.artifactory.jfrt_runtime_heap_maxmemory_bytes") AS avg_heap_max_bytes, avg("jfrog.artifactory.jfrt_runtime_heap_totalmemory_bytes") AS avg_heap_used_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
+          <query>| mstats avg("jfrog.artifactory.jfrt_runtime_heap_processors_total") AS heap_processors , avg("jfrog.artifactory.jfrt_runtime_heap_freememory_bytes") AS avg_heap_free_bytes, avg("jfrog.artifactory.jfrt_runtime_heap_maxmemory_bytes") AS avg_heap_max_bytes, avg("jfrog.artifactory.jfrt_runtime_heap_totalmemory_bytes") AS avg_heap_used_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval heap_pcrs = (heap_processors), avg_heap_free_gb = (avg_heap_free_bytes / 1024 / 1024 / 1024), avg_heap_max_gb = (avg_heap_max_bytes / 1024 / 1024 / 1024), avg_heap_used_gb =  (avg_heap_used_bytes / 1024 / 1024 / 1024)
                    | timechart avg(heap_pcrs) AS "No. of Processors", avg(avg_heap_free_gb) AS "Heap Free(GB)", avg(avg_heap_max_gb) AS "Heap Max(GB)", avg(avg_heap_used_gb) AS "Heap Used(GB)" $timechart_span$
                    | fields - _span*
@@ -514,13 +510,12 @@
       </chart>
     </panel>
   </row>
-
   <row id="metrics_05">
     <panel>
       <chart>
         <title>Garbage Collection</title>
         <search>
-            <query>| mstats avg("jfrog.artifactory.jfrt_artifacts_gc_duration_seconds") AS gc_dur_secs, avg("jfrog.artifactory.jfrt_artifacts_gc_binaries_total") AS gc_binary_tot, avg("jfrog.artifactory.jfrt_artifacts_gc_size_cleaned_bytes") AS avg_gc_cleaned_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
+          <query>| mstats avg("jfrog.artifactory.jfrt_artifacts_gc_duration_seconds") AS gc_dur_secs, avg("jfrog.artifactory.jfrt_artifacts_gc_binaries_total") AS gc_binary_tot, avg("jfrog.artifactory.jfrt_artifacts_gc_size_cleaned_bytes") AS avg_gc_cleaned_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval gc_dur_min = (gc_dur_secs / 60), gc_bin_tot = (gc_binary_tot), avg_gc_cleaned_gb = (avg_gc_cleaned_bytes / 1024 / 1024 / 1024) 
                    | timechart avg(gc_dur_min) AS "GC Duration (Minutes)", avg(gc_bin_tot) AS "GC Cleaned(Binaries)", avg(avg_gc_cleaned_gb) AS "GC Cleaned(GB)" $timechart_span$
                    | fields - _span*
@@ -541,13 +536,12 @@
       </chart>
     </panel>
   </row>
-
   <row id="metrics_06">
     <panel>
       <chart>
         <title>DB Connections</title>
         <search>
-            <query>| mstats avg("jfrog.artifactory.jfrt_db_connections_max_active_total") AS db_conn_max_act, avg("jfrog.artifactory.jfrt_db_connections_min_idle_total") AS db_conn_min_idle, avg("jfrog.artifactory.jfrt_db_connections_idle_total") AS db_conn_tot_idle, avg("jfrog.artifactory.jfrt_db_connections_active_total") AS db_conn_tot_act,  prestats=false WHERE `default_metrics_index` $mstats_span$ 
+          <query>| mstats avg("jfrog.artifactory.jfrt_db_connections_max_active_total") AS db_conn_max_act, avg("jfrog.artifactory.jfrt_db_connections_min_idle_total") AS db_conn_min_idle, avg("jfrog.artifactory.jfrt_db_connections_idle_total") AS db_conn_tot_idle, avg("jfrog.artifactory.jfrt_db_connections_active_total") AS db_conn_tot_act,  prestats=false WHERE `default_metrics_index` $mstats_span$ 
                    | timechart  avg(db_conn_min_idle) AS "Idle(Min)",  avg(db_conn_tot_act) AS "Active", avg(db_conn_tot_idle) AS "Idle" $timechart_span$
                    | fields - _span*
             </query>
@@ -567,13 +561,12 @@
       </chart>
     </panel>
   </row>
-
   <row id="metrics_07">
     <panel>
       <chart>
         <title>HTTP Connections</title>
         <search>
-            <query>| mstats avg("jfrog.artifactory.jfrt_http_connections_max_total") AS http_conn_max_tot, avg("jfrog.artifactory.jfrt_http_connections_leased_total") AS http_conn_lease_tot, avg("jfrog.artifactory.jfrt_http_connections_pending_total") AS http_conn_pend_tot, avg("jfrog.artifactory.jfrt_http_connections_available_total") AS http_conn_ava_tot,  prestats=false WHERE `default_metrics_index` $mstats_span$ 
+          <query>| mstats avg("jfrog.artifactory.jfrt_http_connections_max_total") AS http_conn_max_tot, avg("jfrog.artifactory.jfrt_http_connections_leased_total") AS http_conn_lease_tot, avg("jfrog.artifactory.jfrt_http_connections_pending_total") AS http_conn_pend_tot, avg("jfrog.artifactory.jfrt_http_connections_available_total") AS http_conn_ava_tot,  prestats=false WHERE `default_metrics_index` $mstats_span$ 
                    | timechart  avg(http_conn_lease_tot) AS "Leased",  avg(http_conn_pend_tot) AS "Pending", avg(http_conn_ava_tot) AS "Available" $timechart_span$
                    | fields - _span*
             </query>
@@ -593,5 +586,4 @@
       </chart>
     </panel>
   </row>
-
 </form>

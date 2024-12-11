@@ -2,7 +2,11 @@
 
 All changes to the log analytics integration will be documented in this file.
 
-## [1.0.9] - November 25, 2024
+# [1.0.10] - December 10, 2024
+
+* Upgrade Splunk App to version 1.2.8. Changes are available [here](./CHANGELOG-splunkbase.md)
+
+# [1.0.9] - November 25, 2024
 
 * FluentD sidecar image version bumped to 4.14, to reflect logging improvements in `jfrog_metrics` FluentD plugin
 
@@ -19,7 +23,7 @@ All changes to the log analytics integration will be documented in this file.
 
 ## [1.0.6] - August 8, 2024
 
-* Fix metrics configuration due to deprication of `artifactory.openMetrics` as part of Artifactory 7.87.x charts and renaming it to `artifactory.metrics`
+* Fix metrics configuration due to deprecation of `artifactory.openMetrics` as part of Artifactory 7.87.x charts and renaming it to `artifactory.metrics`
 
 ## [1.0.5] - July 22, 2024
 
