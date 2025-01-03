@@ -2,6 +2,10 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.11] - January 2, 2025
+
+* FluentD sidecar image version bumped to 4.15, to upgrade base image to bitnami/fluentd 1.18.0
+
 # [1.0.10] - December 10, 2024
 
 * Upgrade Splunk App to version 1.2.8. Changes are available [here](./CHANGELOG-splunkbase.md)
