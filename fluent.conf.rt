@@ -28,7 +28,7 @@
   metric_value_key value
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
   gzip_compression "#{ENV['SPLUNK_COMPRESS_DATA']}"
-  @log_level debug
+  debug_http true
 </match>
 
 # CALLHOME
