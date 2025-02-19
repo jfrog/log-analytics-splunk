@@ -1,5 +1,5 @@
 # Dockerfile for bitnami/fluentd sidecar image with all the necessary plugins for our log analytic providers
-FROM bitnami/fluentd:1.17.0
+FROM bitnami/fluentd:1.18.0
 LABEL maintainer="Partner Engineering <partner_support@jfrog.com>"
 
 ## Build time Arguments, short circuit them to ENV Variables so they are available at run time also
@@ -18,7 +18,6 @@ RUN fluent-gem install fluent-plugin-concat
 RUN fluent-gem install fluent-plugin-splunk-hec
 RUN fluent-gem install fluent-plugin-jfrog-siem
 RUN fluent-gem install fluent-plugin-jfrog-metrics
-RUN fluent-gem install fluent-plugin-jfrog-send-metrics
 
 # Install prerequisites
 RUN apt-get update && apt-get install -y curl
