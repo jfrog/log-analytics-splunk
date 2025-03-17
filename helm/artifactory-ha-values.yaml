@@ -5,7 +5,7 @@ artifactory:
     enabled: true
   customInitContainersBegin: |
     - name: "prepare-fluentd-conf-on-persistent-volume"
-      image: {{ include "artifactory.getImageInfoByValue" (list . "initContainers") }}
+      image: {{ include "artifactory-ha.getImageInfoByValue" (list . "initContainers") }}
       imagePullPolicy: "{{ .Values.artifactory.image.pullPolicy }}"
       command:
         - 'sh'

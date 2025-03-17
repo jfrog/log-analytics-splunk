@@ -2,7 +2,7 @@
 
 ## Versions Supported
 
-This integration is last tested with Artifactory 7.71.11 and Xray 3.88.12 versions.
+This integration is last tested with Artifactory 7.104.7 and Xray 3.88.12 versions.
 
 ## Table of Contents
 
@@ -170,7 +170,7 @@ gem install fluent-plugin-jfrog-metrics
 
 We rely heavily on environment variables so that the correct log files are streamed to your observability dashboards. Ensure that you fill in the .env file with correct values. Download the .env file from [here](https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/jfrog.env)
 
-* **JF_PRODUCT_DATA_INTERNAL**: The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory
+* **JF_PRODUCT_DATA_INTERNAL**: This environment variable must be set to the folder that contains the `log` folder. For each JFrog service, you can find its active log files in the `$JFROG_HOME/<product>/var/log`. This environment variable should point to the folder that contains the `log` directory. For example, for `artifactory` set this variable to `$JFROG_HOME/artifactory/var`
 * **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
 * **SPLUNK_HEC_HOST**: Splunk Instance URL
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
@@ -221,7 +221,7 @@ For Splunk as the observability platform, execute these commands to setup the do
    The above command will build the docker image.
 2. Fill the necessary information in the docker.env file
 
-   **JF_PRODUCT_DATA_INTERNAL**: The environment variable JF_PRODUCT_DATA_INTERNAL must be defined to the correct location. For each JFrog service you will find its active log files in the `$JFROG_HOME/<product>/var/log` directory
+   **JF_PRODUCT_DATA_INTERNAL**: This environment variable must be set to the folder that contains the `log` folder. For each JFrog service, you can find its active log files in the `$JFROG_HOME/<product>/var/log`. This environment variable should point to the folder that contains the `log` directory. For example, for `artifactory` set this variable to `$JFROG_HOME/artifactory/var`
    **SPLUNK_COM_PROTOCOL**: HTTP Scheme, http or https
    **SPLUNK_HEC_HOST**: Splunk Instance URL
    **SPLUNK_HEC_PORT**: Splunk HEC configured port
@@ -237,7 +237,7 @@ For Splunk as the observability platform, execute these commands to setup the do
 3. Execute
 
    ```bash
-   docker run -it --name jfrog-fluentd-splunk-rt -v <path_to_logs>:/var/opt/jfrog/artifactory --env-file docker.env <image_name>
+   docker run -it --name jfrog-fluentd-splunk-rt -v <path_to_folder_contains_log_dir>:/var/opt/jfrog/artifactory --env-file docker.env <image_name>
    ```
 
    The <path_to_logs> should be an absolute path where the Jfrog Artifactory Logs folder resides, i.e for an Docker based Artifactory Installation,  ex: /var/opt/jfrog/artifactory/var/logs on the docker host.
