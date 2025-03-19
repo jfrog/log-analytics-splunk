@@ -2,15 +2,20 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.12] - March 18, 2025
+
+* Update artifactory-ha helm values file
+* Readme minor updates
+
 ## [1.0.11] - January 2, 2025
 
 * FluentD sidecar image version bumped to 4.15, to upgrade base image to bitnami/fluentd 1.18.0
 
-# [1.0.10] - December 10, 2024
+## [1.0.10] - December 10, 2024
 
 * Upgrade Splunk App to version 1.2.8. Changes are available [here](./CHANGELOG-splunkbase.md)
 
-# [1.0.9] - November 25, 2024
+## [1.0.9] - November 25, 2024
 
 * FluentD sidecar image version bumped to 4.14, to reflect logging improvements in `jfrog_metrics` FluentD plugin
 
