@@ -11,7 +11,7 @@
   common_jpd "#{ENV['COMMON_JPD']}"
   # @log_level debug
   # request_timeout 30s
-  # verify_ssl "#{ENV['SPLUNK_VERIFY_SSL']}"
+  verify_ssl "#{ENV['SPLUNK_VERIFY_SSL']}"
 </source>
 # SPLUNK ARTIFACTORY METRICS OUTPUT
 <match jfrog.metrics.**>
