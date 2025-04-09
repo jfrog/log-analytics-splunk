@@ -351,6 +351,9 @@
   # SPLUNK OUTPUT
   ####################
   # SPLUNK XRAY LOGS OUTPUT
+  <system>
+    log_level debug
+  </system>
   <match jfrog.xray.**>
     @type splunk_hec
     protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
