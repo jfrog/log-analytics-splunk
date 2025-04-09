@@ -29,6 +29,7 @@
   index jfrog_splunk_metrics
   metric_name_key metric_name
   metric_value_key value
+  @log_level trace
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
   gzip_compression "#{ENV['SPLUNK_COMPRESS_DATA']}"
 </match>
