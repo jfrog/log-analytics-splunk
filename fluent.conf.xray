@@ -1,4 +1,7 @@
 # JFROG XRAY METRICS SOURCE
+<system>
+  log_level debug
+</system>
 <source>
   @type jfrog_metrics
   @id metrics_http_jfrt
@@ -9,7 +12,7 @@
   username "#{ENV['JPD_ADMIN_USERNAME']}"
   token "#{ENV['JFROG_ADMIN_TOKEN']}"
   common_jpd "#{ENV['COMMON_JPD']}"
-  # @log_level debug
+  @log_level debug
   # request_timeout 30s
   # verify_ssl "#{ENV['SPLUNK_VERIFY_SSL']}"
 </source>
@@ -351,9 +354,6 @@
   # SPLUNK OUTPUT
   ####################
   # SPLUNK XRAY LOGS OUTPUT
-  <system>
-    log_level debug
-  </system>
   <match jfrog.xray.**>
     @type splunk_hec
     protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
