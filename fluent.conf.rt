@@ -23,7 +23,7 @@
   hec_token "#{ENV['SPLUNK_METRICS_HEC_TOKEN']}"
   flush_interval 5s
   source ${tag}
-  index jfrog_splunk_metrics
+  index jfrog_splunk_metrics_2
   metric_name_key metric_name
   metric_value_key value
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
@@ -395,7 +395,7 @@
     hec_host "#{ENV['SPLUNK_HEC_HOST']}"
     hec_port "#{ENV['SPLUNK_HEC_PORT']}"
     hec_token "#{ENV['SPLUNK_HEC_TOKEN']}"
-    index jfrog_splunk
+    index jfrog_splunk_2
     format json
     sourcetype_key log_source
     use_fluentd_time false
