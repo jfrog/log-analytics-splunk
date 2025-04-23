@@ -49,11 +49,11 @@
       <chart>
         <title>Log Volume</title>
         <search>
-          <query>`default_index` $logs_control$ log_source!="NULL" log_source="jfrog.xray.*" | timechart count by log_source</query>
+          <query>`default_index` $logs_control$ (sourcetype!="NULL" OR log_source!="NULL") (sourcetype="jfrog.xray.*" OR log_source="jfrog.xray.*") | timechart count by sourcetype</query>
           <earliest>$field1.earliest$</earliest>
           <latest>$field1.latest$</latest>
         </search>
-        <option name="charting.chart">area</option>
+        <option name="charting.chart">column</option>
         <option name="charting.chart.stackMode">default</option>
         <option name="charting.drilldown">all</option>
         <option name="charting.layout.splitSeries">0</option>
@@ -408,7 +408,7 @@
       <chart>
         <title>CPU Usage</title>
         <search>
-            <query>| mstats avg("jfrog.xray.sys_cpu_ratio") AS cpu_ratio prestats=false WHERE `default_metrics_index` $mstats_span$
+            <query>| mstats avg("jfrog.xray.jfob_sys_cpu_ratio") AS cpu_ratio prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval cpu_pct = (cpu_ratio * 100)
                    | timechart avg(cpu_pct) AS "CPU %" $timechart_span$
                    | fields - _span*
@@ -435,7 +435,7 @@
       <chart>
         <title>System Memory</title>
         <search>
-            <query>| mstats avg("jfrog.xray.sys_memory_used_bytes") AS avg_used, avg("jfrog.xray.sys_memory_free_bytes") AS avg_free prestats=false WHERE `default_metrics_index` $mstats_span$
+            <query>| mstats avg("jfrog.xray.jfob_sys_memory_used_bytes") AS avg_used, avg("jfrog.xray.sys_memory_free_bytes") AS avg_free prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval mem_used_gb = (avg_used / 1024 / 1024 / 1024), mem_free_gb = (avg_free / 1024 / 1024 / 1024)
                    | timechart avg(mem_used_gb) AS "Sys Used(GB)", avg(mem_free_gb) AS "Sys Free(GB)" $timechart_span$
                    | fields - _span*
@@ -462,7 +462,7 @@
       <chart>
         <title>Disk Usage</title>
         <search>
-            <query>| mstats avg("jfrog.xray.app_disk_free_bytes") AS avg_disk_free, avg("jfrog.xray.app_disk_used_bytes") AS avg_disk_used prestats=false WHERE `default_metrics_index` $mstats_span$
+            <query>| mstats avg("jfrog.xray.jfob_app_disk_free_bytes") AS avg_disk_free, avg("jfrog.xray.app_disk_used_bytes") AS avg_disk_used prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval disk_free_gb = (avg_disk_free / 1024 / 1024 / 1024), disk_used_gb = (avg_disk_used / 1024 / 1024 / 1024)
                    | timechart avg(disk_free_gb) AS "Disk Free(GB)", avg(disk_used_gb) AS "Disk Used(GB)" $timechart_span$
                    | fields - _span*
@@ -489,7 +489,7 @@
       <chart>
         <title>Heap Memory</title>
         <search>
-            <query>| mstats avg("jfrog.xray.go_memstats_heap_objects_total") AS heap_objects , avg("jfrog.xray.go_memstats_heap_allocated_bytes") AS avg_heap_max_bytes, avg("jfrog.xray.go_memstats_heap_in_use_bytes") AS avg_heap_used_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
+            <query>| mstats avg("jfrog.xray.jfob_go_memstats_heap_objects_total") AS heap_objects , avg("jfrog.xray.go_memstats_heap_allocated_bytes") AS avg_heap_max_bytes, avg("jfrog.xray.go_memstats_heap_in_use_bytes") AS avg_heap_used_bytes prestats=false WHERE `default_metrics_index` $mstats_span$
                    | eval heap_objs = (heap_objects), avg_heap_max_gb = (avg_heap_max_bytes / 1024 / 1024 / 1024), avg_heap_used_gb =  (avg_heap_used_bytes / 1024 / 1024 / 1024)
                    | timechart avg(heap_objs) AS "No. of Objects", avg(avg_heap_max_gb) AS "Heap Max(GB)", avg(avg_heap_used_gb) AS "Heap Used(GB)" $timechart_span$
                    | fields - _span*
