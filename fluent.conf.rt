@@ -16,6 +16,7 @@
 # SPLUNK ARTIFACTORY METRICS OUTPUT
 <match jfrog.metrics.**>
   @type splunk_hec
+  debug_http true
   protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
   data_type metric
   hec_host "#{ENV['SPLUNK_HEC_HOST']}"
@@ -23,7 +24,7 @@
   hec_token "#{ENV['SPLUNK_METRICS_HEC_TOKEN']}"
   flush_interval 5s
   source ${tag}
-  index jfrog_splunk_metrics_2
+  index jfrog_splunk_metrics
   metric_name_key metric_name
   metric_value_key value
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
@@ -391,11 +392,12 @@
   ## SPLUNK ARTIFACTORY LOGS OUTPUT
   <match jfrog.rt.**>
     @type splunk_hec
+    debug_http true
     protocol "#{ENV['SPLUNK_COM_PROTOCOL']}"
     hec_host "#{ENV['SPLUNK_HEC_HOST']}"
     hec_port "#{ENV['SPLUNK_HEC_PORT']}"
     hec_token "#{ENV['SPLUNK_HEC_TOKEN']}"
-    index jfrog_splunk_2
+    index jfrog_splunk
     format json
     sourcetype_key log_source
     use_fluentd_time false
