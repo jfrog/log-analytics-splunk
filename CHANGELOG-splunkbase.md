@@ -1,3 +1,6 @@
+## [1.2.9] - April 22nd, 2025
+* Update search queries to fix Xray Log Volume, CPU Usage, System Memory, Disk Usage, Heap Memory graphs
+
 ## [1.2.8] - December 10th, 2024
 * Update docker panels to mach new log lines structure
 * Add `check_meta_default_write_access` to the app configuration
