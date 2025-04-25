@@ -3,7 +3,7 @@
 All changes to the log analytics integration will be documented in this file.
 
 ## [1.0.13] - April 22, 2025
-* 
+
 * Upgrade Splunk App to version 1.2.9. Changes are available [here](./CHANGELOG-splunkbase.md)
 
 ## [1.0.12] - March 18, 2025
