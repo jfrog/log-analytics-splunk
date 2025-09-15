@@ -56,6 +56,8 @@ common:
           value: {{ .Values.splunk.verify_ssl | quote}}  
         - name: SPLUNK_COMPRESS_DATA
           value: {{ .Values.splunk.compress_data | quote }}
+        - name: LOG_ENV
+          value: {{ .Values.jfrog.observability.log_env | default "production" }}
 splunk:
   host: SPLUNK_HEC_HOST
   port: SPLUNK_HEC_PORT
@@ -70,3 +72,4 @@ jfrog:
     jpd_url: JPD_URL
     username: JPD_ADMIN_USERNAME
     common_jpd: COMMON_JPD
+    log_env: LOG_ENV

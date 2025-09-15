@@ -28,6 +28,15 @@
   metric_value_key value
   insecure_ssl "#{ENV['SPLUNK_INSECURE_SSL']}"
   gzip_compression "#{ENV['SPLUNK_COMPRESS_DATA']}"
+  <buffer>
+    flush_interval 5s
+  </buffer>
+  <format>
+    @type json
+    <record>
+      env "#{ENV['LOG_ENV']}"
+    </record>
+  </format>
 </match>
 
 # CALLHOME
@@ -379,6 +388,7 @@
     <record>
       hostname "#{Socket.gethostname}"
       log_source ${tag}
+      env "#{ENV['LOG_ENV']}"
     </record>
   </filter>
 

@@ -183,6 +183,7 @@ We rely heavily on environment variables so that the correct log files are strea
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
 * **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
 * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+* **LOG_ENV**: Optional environment tag for categorizing logs and metrics (e.g., `staging`, `production`, `dev`). This tag will be added to all logs and metrics sent to Splunk as `env:<value>`
 
 Apply the .env files and then run the fluentd wrapper with one argument pointed to the `fluent.conf.*` file configured.
 
@@ -234,6 +235,7 @@ For Splunk as the observability platform, execute these commands to setup the do
    **JPD_ADMIN_USERNAME**: Artifactory username for authentication
    **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
    **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+   **LOG_ENV**: Optional environment tag for categorizing logs and metrics (e.g., `staging`, `production`, `dev`). This tag will be added to all logs and metrics sent to Splunk as `env:<value>`
 3. Execute
 
    ```bash
@@ -325,6 +327,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
    * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
    * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
    * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+   * **LOG_ENV**: Optional environment tag for categorizing logs and metrics (e.g., `staging`, `production`, `dev`). This tag will be added to all logs and metrics sent to Splunk as `env:<value>`
 
    Apply the .env files using the helm command below
 
@@ -353,6 +356,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
           --set jfrog.observability.jpd_url=$JPD_URL \
           --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
           --set jfrog.observability.common_jpd=$COMMON_JPD \
+          --set jfrog.observability.log_env=$LOG_ENV \
           -f helm/artifactory-values.yaml \
           -n $INST_NAMESPACE --create-namespace
    ```
@@ -399,6 +403,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
    * **JPD_URL**: Artifactory JPD URL of the format `http://<ip_address>`
    * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
    * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+   * **LOG_ENV**: Optional environment tag for categorizing logs and metrics (e.g., `staging`, `production`, `dev`). This tag will be added to all logs and metrics sent to Splunk as `env:<value>`
 
    Apply the .env files and then run the helm command below
 
@@ -427,6 +432,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
         --set jfrog.observability.jpd_url=$JPD_URL \
         --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
         --set jfrog.observability.common_jpd=$COMMON_JPD \
+        --set jfrog.observability.log_env=$LOG_ENV \
         -f helm/artifactory-ha-values.yaml \
         -n $INST_NAMESPACE --create-namespace
    ```
@@ -457,6 +463,7 @@ For Xray installation, download the .env file from [here](https://raw.githubuser
 * **JPD_ADMIN_USERNAME**: Artifactory username for authentication
 * **JFROG_ADMIN_TOKEN**: For security reasons, this value will be pulled from the secret jfrog-admin-token created in the step above
 * **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
+* **LOG_ENV**: Optional environment tag for categorizing logs and metrics (e.g., `staging`, `production`, `dev`). This tag will be added to all logs and metrics sent to Splunk as `env:<value>`
 
 Apply the .env files and then run the helm command below
 
@@ -487,6 +494,7 @@ helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=$JPD_URL \
     --set jfrog.observability.jpd_url=$JPD_URL \
     --set jfrog.observability.username=$JPD_ADMIN_USERNAME \
     --set jfrog.observability.common_jpd=$COMMON_JPD \
+    --set jfrog.observability.log_env=$LOG_ENV \
     -f helm/xray-values.yaml \
     -n $INST_NAMESPACE --create-namespace
 ```

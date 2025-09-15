@@ -12,7 +12,7 @@ artifactory:
         - '-c'
         - >
           mkdir -p {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/;
-          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
+          curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/feature/JOBS-1114/fluent.conf.rt -o {{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
           name: volume
@@ -53,6 +53,8 @@ artifactory:
           value: {{ .Values.splunk.verify_ssl | quote}}  
         - name: SPLUNK_COMPRESS_DATA
           value: {{ .Values.splunk.compress_data | quote}}
+        - name: LOG_ENV
+          value: {{ .Values.jfrog.observability.log_env | default "production" }}
         - name: FLUENTD_CONF
           value: ../../../..{{ .Values.artifactory.persistence.mountPath }}/etc/fluentd/fluentd.conf
 splunk:
@@ -69,3 +71,4 @@ jfrog:
     jpd_url: JPD_URL
     username: JPD_ADMIN_USERNAME
     common_jpd: COMMON_JPD
+    log_env: LOG_ENV
