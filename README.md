@@ -344,7 +344,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
    ```bash
    helm upgrade --install artifactory jfrog/artifactory \
           --set artifactory.joinKey=$JOIN_KEY \
-          --set databaseUpgradeReady=true --set postgresql.auth.password=$POSTGRES_PASSWORD --set nginx.service.ssloffload=true \
+          --set databaseUpgradeReady=true --set postgresql.postgresqlPassword=$POSTGRES_PASSWORD --set nginx.service.ssloffload=true \
           --set splunk.host=$SPLUNK_HEC_HOST \
           --set splunk.port=$SPLUNK_HEC_PORT \
           --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
@@ -420,7 +420,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
    ```bash
    helm upgrade --install artifactory-ha jfrog/artifactory-ha \
         --set artifactory.joinKey=$JOIN_KEY \
-        --set databaseUpgradeReady=true --set postgresql.auth.password=$POSTGRES_PASSWORD --set nginx.service.ssloffload=true \
+        --set databaseUpgradeReady=true --set postgresql.postgresqlPassword=$POSTGRES_PASSWORD --set nginx.service.ssloffload=true \
         --set splunk.host=$SPLUNK_HEC_HOST \
         --set splunk.port=$SPLUNK_HEC_PORT \
         --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
