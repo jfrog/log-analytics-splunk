@@ -47,6 +47,10 @@ artifactory:
           value: {{ .Values.splunk.metrics_token }}
         - name: SPLUNK_HEC_TOKEN
           value: {{ .Values.splunk.logs_token }}
+        - name: SPLUNK_LOGS_INDEX
+          value: {{ .Values.splunk.logs_index | default "jfrog_splunk" }}
+        - name: SPLUNK_METRICS_INDEX
+          value: {{ .Values.splunk.metrics_index | default "jfrog_splunk_metrics" }}
         - name: SPLUNK_INSECURE_SSL
           value: {{ .Values.splunk.insecure_ssl | quote}}
         - name: SPLUNK_VERIFY_SSL
@@ -62,6 +66,8 @@ splunk:
   port: SPLUNK_HEC_PORT
   logs_token: SPLUNK_HEC_TOKEN
   metrics_token: SPLUNK_METRICS_HEC_TOKEN
+  logs_index: SPLUNK_LOGS_INDEX
+  metrics_index: SPLUNK_METRICS_INDEX
   com_protocol: SPLUNK_COM_PROTOCOL
   insecure_ssl: SPLUNK_INSECURE_SSL
   verify_ssl: SPLUNK_VERIFY_SSL

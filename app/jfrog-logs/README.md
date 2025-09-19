@@ -4,10 +4,12 @@
 Install the app in your Splunk instance. Then restart your Splunk instance by going to _Server Controls > Restart_.
 
 ## Splunk Setup
-1. Create new Events index `jfrog_splunk` at _Settings > Indexes > New Index > Save_
-2. Create new Metrics index `jfrog_splunk_metrics` at _Settings > Indexes > New Index > Metrics > Save_
+1. Create new Events index `jfrog_splunk` (or your custom name) at _Settings > Indexes > New Index > Save_
+2. Create new Metrics index `jfrog_splunk_metrics` (or your custom name) at _Settings > Indexes > New Index > Metrics > Save_
 3. Create a new HTTP Event Collector data input for logs at _Settings > Data Inputs > HTTP Event Collector > New Token > jfrog_splunk index > Save_
 4. Create a new HTTP Event Collector data input for metrics at _Settings > Data Inputs > HTTP Event Collector > New Token > jfrog_splunk_metrics index > Save_
+
+**Note:** You can customize the index names by setting the `SPLUNK_LOGS_INDEX` and `SPLUNK_METRICS_INDEX` environment variables in your configuration.
 
 ## Setup Fluentd
 FluentD is used to send log events to Splunk. This [repo](https://github.com/jfrog/log-analytics-splunk) contains instructions on various installations options for Fluentd as a logging agent. 
@@ -21,6 +23,8 @@ export SPLUNK_HEC_HOST=splunk.example.com
 export SPLUNK_HEC_PORT=8088
 export SPLUNK_HEC_TOKEN=SPLUNK_HEC_TOKEN
 export SPLUNK_METRICS_HEC_TOKEN=SPLUNK_METRICS_HEC_TOKEN
+export SPLUNK_LOGS_INDEX=jfrog_splunk
+export SPLUNK_METRICS_INDEX=jfrog_splunk_metrics
 export SPLUNK_INSECURE_SSL=false
 export SPLUNK_VERIFY_SSL=true
 export SPLUNK_COMPRESS_DATA=true
@@ -36,6 +40,8 @@ export COMMON_JPD=false
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
 * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
 * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+* **SPLUNK_LOGS_INDEX**: Splunk index name for storing logs (default: jfrog_splunk)
+* **SPLUNK_METRICS_INDEX**: Splunk index name for storing metrics (default: jfrog_splunk_metrics)
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
 * **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
 * **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk

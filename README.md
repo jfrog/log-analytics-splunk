@@ -52,26 +52,28 @@ Our integration uses the [Splunk HEC](https://dev.splunk.com/enterprise/docs/dat
 
 Users will need to configure the HEC to accept data (enabled) and also create a new token. Steps are below.
 
-#### Create index jfrog_splunk
+#### Create index for logs (default: jfrog_splunk)
 
 ```text
 1. Open Splunk web console as administrator
 2. Click on "Settings" in dropdown select "Indexes"
 3. Click on "New Index"
-4. Enter Index name as jfrog_splunk
+4. Enter Index name as jfrog_splunk (or your custom name)
 5. Click "Save"
 ```
 
-#### Create index jfrog_splunk_metrics
+#### Create index for metrics (default: jfrog_splunk_metrics)
 
 ```text
 1. Open Splunk web console as administrator
 2. Click on "Settings" in dropdown select "Indexes"
 3. Click on "New Index"
-4. Enter Index name as jfrog_splunk_metrics
+4. Enter Index name as jfrog_splunk_metrics (or your custom name)
 5. Select Index Data Type as Metrics
 6. Click "Save"
 ```
+
+**Note:** You can customize the index names by setting the `SPLUNK_LOGS_INDEX` and `SPLUNK_METRICS_INDEX` environment variables in your docker.env file.
 
 #### Configure new HEC token to receive Logs
 
@@ -83,7 +85,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Enter a "Name" in the textbox
 6. (Optional) Enter a "Description" in the textbox
 7. Click on the green "Next" button
-8. Add "jfrog_splunk" index to store the JFrog platform log data into.
+8. Add "jfrog_splunk" (or your custom logs index name) to store the JFrog platform log data into.
 9. Click on the green "Review" button
 10. If good, Click on the green "Done" button
 11. Save the generated token value
@@ -99,7 +101,7 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 5. Enter a "Name" in the textbox
 6. (Optional) Enter a "Description" in the textbox
 7. Click on the green "Next" button
-8. Add "jfrog_splunk_metrics" index to store the JFrog platform metrics data into.
+8. Add "jfrog_splunk_metrics" (or your custom metrics index name) to store the JFrog platform metrics data into.
 9. Click on the green "Review" button
 10. If good, Click on the green "Done" button
 11. Save the generated token value
@@ -176,6 +178,8 @@ We rely heavily on environment variables so that the correct log files are strea
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
 * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
 * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+* **SPLUNK_LOGS_INDEX**: Splunk index name for storing logs (default: jfrog_splunk)
+* **SPLUNK_METRICS_INDEX**: Splunk index name for storing metrics (default: jfrog_splunk_metrics)
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
 * **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
 * **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk
@@ -349,6 +353,8 @@ export MASTER_KEY=$(openssl rand -hex 32)
           --set splunk.port=$SPLUNK_HEC_PORT \
           --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
           --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
+          --set splunk.logs_index=$SPLUNK_LOGS_INDEX \
+          --set splunk.metrics_index=$SPLUNK_METRICS_INDEX \
           --set splunk.compress_data=$SPLUNK_COMPRESS_DATA \
           --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
           --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
@@ -425,6 +431,8 @@ export MASTER_KEY=$(openssl rand -hex 32)
         --set splunk.port=$SPLUNK_HEC_PORT \
         --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
         --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
+        --set splunk.logs_index=$SPLUNK_LOGS_INDEX \
+        --set splunk.metrics_index=$SPLUNK_METRICS_INDEX \
         --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
         --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
         --set splunk.verify_ssl=$SPLUNK_VERIFY_SSL \
@@ -456,6 +464,8 @@ For Xray installation, download the .env file from [here](https://raw.githubuser
 * **SPLUNK_HEC_PORT**: Splunk HEC configured port
 * **SPLUNK_HEC_TOKEN**: Splunk HEC Token for sending logs to Splunk
 * **SPLUNK_METRICS_HEC_TOKEN**: Splunk HEC Token for sending metrics to Splunk
+* **SPLUNK_LOGS_INDEX**: Splunk index name for storing logs (default: jfrog_splunk)
+* **SPLUNK_METRICS_INDEX**: Splunk index name for storing metrics (default: jfrog_splunk_metrics)
 * **SPLUNK_INSECURE_SSL**: false for test environments only or if http scheme
 * **SPLUNK_VERIFY_SSL**: false for disabling ssl validation (useful for proxy forwarding or bypassing ssl certificate validation)
 * **SPLUNK_COMPRESS_DATA**: true for compressing logs and metrics json payloads on outbound to Splunk
@@ -487,6 +497,8 @@ helm upgrade --install xray jfrog/xray --set xray.jfrogUrl=$JPD_URL \
     --set splunk.port=$SPLUNK_HEC_PORT \
     --set splunk.logs_token=$SPLUNK_HEC_TOKEN \
     --set splunk.metrics_token=$SPLUNK_METRICS_HEC_TOKEN \
+    --set splunk.logs_index=$SPLUNK_LOGS_INDEX \
+    --set splunk.metrics_index=$SPLUNK_METRICS_INDEX \
     --set splunk.com_protocol=$SPLUNK_COM_PROTOCOL \
     --set splunk.insecure_ssl=$SPLUNK_INSECURE_SSL \
     --set splunk.verify_ssl=$SPLUNK_VERIFY_SSL \
