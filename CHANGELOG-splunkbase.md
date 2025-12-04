@@ -1,3 +1,10 @@
+## [1.3.0] - December 3rd, 2024
+* Updated Xray dashboard widgets and visualizations
+* Improved widget layouts and data queries
+* Added documentation for configuring search macros with custom index names
+* Updated macros.conf with default index values
+* Fixed PostgreSQL password secret path in Kubernetes deployment instructions (changed from `.data.postgresql-password` to `.data.password`)
+
 ## [1.2.9] - April 22nd, 2025
 * Update search queries to fix Xray Log Volume, CPU Usage, System Memory, Disk Usage, Heap Memory graphs
 

@@ -107,6 +107,26 @@ Users will need to configure the HEC to accept data (enabled) and also create a 
 11. Save the generated token value
 ```
 
+#### Configure Search Macros
+
+After installing the app and creating your indexes, you need to configure the search macros to use your actual index names.
+
+```text
+1. Open Splunk web console as administrator
+2. Click on "Settings" → "Advanced search" → "Search macros"
+3. In the "App" dropdown, select "JFrog Platform Log Analytics, Violations and Metrics" (or "jfrog-logs")
+4. Click on "default_index" macro to edit it
+5. Change the definition from index="$SPLUNK_LOGS_INDEX$" to index="jfrog_splunk" (or your custom logs index name)
+6. Click "Save"
+7. Click on "default_metrics_index" macro to edit it
+8. Change the definition from "index"="$SPLUNK_METRICS_INDEX$" to "index"="jfrog_splunk_metrics" (or your custom metrics index name)
+9. Click "Save"
+```
+
+**Note:** If you're using environment variables `$SPLUNK_LOGS_INDEX$` and `$SPLUNK_METRICS_INDEX$` in your deployment, you can skip this step as the macros will automatically use those values.
+
+**Important:** Without configuring these macros, the dashboards will not display any data even if your indexes contain logs and metrics.
+
 ## JFrog Metrics Setup
 
 For non Kubernetes-based installations, enable metrics in Artifactory, make the following configuration changes to the [Artifactory System YAML](https://www.jfrog.com/confluence/display/JFROG/Artifactory+System+YAML)
@@ -341,7 +361,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
 4. Postgres password is required to upgrade Artifactory. Run the following command to get the current password
 
    ```bash
-   POSTGRES_PASSWORD=$(kubectl get secret artifactory-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
+   POSTGRES_PASSWORD=$(kubectl get secret artifactory-postgresql -o jsonpath="{.data.password}" | base64 --decode)
    ```
 5. Upgrade Artifactory installation using the command below
 
@@ -419,7 +439,7 @@ export MASTER_KEY=$(openssl rand -hex 32)
 5. Postgres password is required to upgrade Artifactory. Run the following command to get the current password
 
    ```bash
-   POSTGRES_PASSWORD=$(kubectl get secret artifactory-ha-postgresql -o jsonpath="{.data.postgresql-password}" | base64 --decode)
+   POSTGRES_PASSWORD=$(kubectl get secret artifactory-ha-postgresql -o jsonpath="{.data.password}" | base64 --decode)
    ```
 6. Upgrade Artifactory HA installation using the command below
 
