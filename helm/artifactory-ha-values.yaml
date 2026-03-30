@@ -18,7 +18,7 @@ artifactory:
           name: volume
   customSidecarContainers: |
     - name: "artifactory-fluentd-sidecar"
-      image: "releases-pts-observability-fluentd.jfrog.io/fluentd:4.15"
+      image: "releases-docker.jfrog.io/fluentd:4.17"
       imagePullPolicy: "IfNotPresent"
       volumeMounts:
         - mountPath: "{{ .Values.artifactory.persistence.mountPath }}"
