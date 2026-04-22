@@ -143,7 +143,10 @@ artifactory:
 
 Once this configuration is done and the application is restarted, metrics will be available in Open Metrics Format
 
-Metrics are enabled by default in Xray.
+:bulb: Metrics are enabled by default in Xray.
+
+:bulb: **RTFS Metrics**: If your Artifactory deployment includes RTFS (JFrog Artifactory Federation Service), metrics are automatically collected from the `rtfs/api/v1/metrics` endpoint. No additional configuration is required -- the fluentd config already includes an RTFS metrics source block that runs alongside the standard Artifactory metrics collection. Requires `fluent-plugin-jfrog-metrics` >= 0.2.16.
+
 For Kubernetes-based installations, openMetrics is enabled in the helm install commands listed below
 
 ## Fluentd Installation
@@ -544,6 +547,10 @@ JFrog Artifactory Dashboard is divided into multiple sections Application, Audit
 * **System Metrics** - This section tracks CPU Usage, System Memory and Disk Usage metrics
 * **Heap Metrics** - This section tracks Heap Memory and Garbage Collection
 * **Connection Metrics** - This section tracks Database connections and HTTP Connections
+
+#### JFrog RTFS Metrics
+
+When RTFS is deployed as part of Artifactory, RTFS metrics are collected from `rtfs/api/v1/metrics` and forwarded to Splunk with the `jfrog.rtfs` metric prefix. These metrics are available alongside standard Artifactory metrics in Splunk for monitoring RTFS-specific performance and health.
 
 ### Xray dashboard
 
