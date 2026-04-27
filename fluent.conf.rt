@@ -272,7 +272,7 @@
   tag jfrog.rt.access.audit
   <parse>
     @type regexp
-    expression /^(?<log_timestamp>[^ ]*)\|(?<token_id>[^ ]*)\|(?<user_ip>[^ ]*)\|(?<user>[^ ]*)\|(?<logged_principal>[^ ]*)\|(?<entity_name>[^ ]*)\|(?<event_type>[^ ]*)\|(?<event>[^ ]*)\|(?<data_changed>.*)/
+    expression /^(?<log_timestamp>[^ ]*)\|(?<trace_id>[^ ]*)\|(?<user_ip>[^ ]*)\|(?<user>[^ ]*)\|(?<logged_principal>[^ ]*)\|(?<entity_name>[^ ]*)\|(?<event_type>[^ ]*)\|(?<event>[^ ]*)\|(?<data_changed>.*)/
     time_key log_timestamp
     time_format %Y-%m-%dT%H:%M:%S.%LZ
   </parse>

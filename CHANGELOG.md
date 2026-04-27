@@ -2,6 +2,10 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.15] - April 2026
+
+* Fix incorrect field name in access-security-audit log parsing: renamed `token_id` capture group to `trace_id` to match the actual log format documented at https://docs.jfrog.com/administration/docs/audit-trail-log (JOBS-2031)
+
 ## [1.0.14] - April 2026
 
 * Added RTFS (JFrog Artifactory Federation Service) metrics collection support in Artifactory fluentd config (JOBS-1897)
