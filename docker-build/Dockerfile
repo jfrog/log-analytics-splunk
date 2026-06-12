@@ -22,7 +22,7 @@ RUN apt-get update && \
 RUN fluent-gem install fluent-plugin-concat && \
     fluent-gem install fluent-plugin-splunk-hec && \
     fluent-gem install fluent-plugin-jfrog-siem && \
-    fluent-gem install fluent-plugin-jfrog-metrics -v '~> 0.2.17' && \
+    fluent-gem install fluent-plugin-jfrog-metrics && \
     fluent-gem install fluent-plugin-jfrog-send-metrics
 
 ## Download Config Files
