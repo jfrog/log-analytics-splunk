@@ -263,10 +263,13 @@ For Splunk as the observability platform, execute these commands to setup the do
    **JFROG_ADMIN_TOKEN**: Artifactory [Access Token](https://jfrog.com/help/r/how-to-generate-an-access-token-video/artifactory-creating-access-tokens-in-artifactory) for authentication
    **COMMON_JPD**: This flag should be set as true only for non-kubernetes installations or installations where JPD base URL is same to access both Artifactory and Xray (ex: https://sample_base_url/artifactory or https://sample_base_url/xray)
    **LOG_ENV**: Optional environment tag for categorizing logs and metrics (e.g., `staging`, `production`, `dev`). This tag will be added to all logs and metrics sent to Splunk as `env:<value>`
-3. Execute
+3. Execute the `docker run` command below.
+
+   > **⚠️ Before you run — log file permissions (uid 999):** the container runs as the non-root `fluent` user (uid `999`) and must **read** the mounted Artifactory logs and **write** `.pos` files into the mounted log directory. JFrog product logs are typically mode `640`, owned by the product user, which uid `999` cannot access by default — so the plain command **fails immediately** with `Errno::EACCES ... .pos` and the worker crash-loops, and **no logs or metrics are sent**. The quickest fix is to add `--user root` (shown below); for non-root alternatives see the **IMPORTANT** note right after this step.
 
    ```bash
-   docker run -it --name jfrog-fluentd-splunk-rt -v <path_to_folder_contains_log_dir>:/var/opt/jfrog/artifactory --env-file docker.env <image_name>
+   # --user root avoids the uid 999 log-permission issue described above (see the IMPORTANT note for non-root options)
+   docker run -it --user root --name jfrog-fluentd-splunk-rt -v <path_to_folder_contains_log_dir>:/var/opt/jfrog/artifactory --env-file docker.env <image_name>
    ```
 
    The <path_to_logs> should be an absolute path where the Jfrog Artifactory Logs folder resides, i.e for an Docker based Artifactory Installation,  ex: /var/opt/jfrog/artifactory/var/logs on the docker host.
@@ -274,8 +277,11 @@ For Splunk as the observability platform, execute these commands to setup the do
    Command example
 
    ```bash
-   docker run -it --name jfrog-fluentd-splunk-rt -v $JFROG_HOME/artifactory/var/:/var/opt/jfrog/artifactory --env-file docker.env jfrog/fluentd-splunk-rt
+   docker run -it --user root --name jfrog-fluentd-splunk-rt -v $JFROG_HOME/artifactory/var/:/var/opt/jfrog/artifactory --env-file docker.env jfrog/fluentd-splunk-rt
    ```
+
+> [!IMPORTANT]
+> The fluentd image runs as a non-root user (`fluent`, uid `999`). The container tails the Artifactory log files from the mounted directory and writes `.pos` (position) files next to them, so uid `999` must be able to **read** the mounted log files and **write** into the mounted log directory. JFrog product logs are typically owned by the product user (for example uid `1030`, directory mode `755`, files mode `640`), which uid `999` cannot access by default - fluentd then fails with `Errno::EACCES ... .pos` and the worker restarts in a loop. To avoid this, either run the container as root (`docker run --user root ...`), run it as the uid that owns the Artifactory logs (`--user <artifactory-uid>`), or make the mounted log directory readable and writable by uid `999`.
 
 ### Kubernetes Deployment with Helm
 
