@@ -2,6 +2,11 @@
 
 All changes to the log analytics integration will be documented in this file.
 
+## [1.0.16] - June 2026
+
+* Fluentd sidecar image bumped to 4.21: now consumes the released image `releases-docker.jfrog.io/fluentd:4.21` directly (fluentd 1.19.2 on a hardened, CVE-refreshed base), remediating Critical/High CVEs in 4.19 (JOBS-2475)
+* `docker-build/Dockerfile` now builds `FROM releases-docker.jfrog.io/fluentd:4.21`, which already bundles curl and every required plugin (fluent-plugin-splunk-hec, -jfrog-siem, -jfrog-metrics, -jfrog-send-metrics, -concat), so the per-plugin `fluent-gem install` and `apt-get` steps were removed
+
 ## [1.0.15] - April 2026
 
 * Fix incorrect field name in access-security-audit log parsing: renamed `token_id` capture group to `trace_id` to match the actual log format documented at https://docs.jfrog.com/administration/docs/audit-trail-log (JOBS-2031)

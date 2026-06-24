@@ -1,5 +1,5 @@
-# Dockerfile for bitnami/fluentd sidecar image with all the necessary plugins for our log analytic providers
-FROM bitnami/fluentd:1.18.0
+# Dockerfile for fluentd sidecar image with all the necessary plugins for our log analytic providers
+FROM releases-docker.jfrog.io/fluentd:4.21
 LABEL maintainer="Partner Engineering <partner_support@jfrog.com>"
 
 ## Build time Arguments, short circuit them to ENV Variables so they are available at run time also
@@ -13,23 +13,13 @@ ENV TGT_PLATFORM=$TARGET
 
 USER root
 
-## Install JFrog Plugins
-RUN fluent-gem install fluent-plugin-concat
-RUN fluent-gem install fluent-plugin-splunk-hec
-RUN fluent-gem install fluent-plugin-jfrog-siem
-RUN fluent-gem install fluent-plugin-jfrog-metrics
-RUN fluent-gem install fluent-plugin-jfrog-send-metrics
-
-# Install prerequisites
-RUN apt-get update && apt-get install -y curl
-CMD /bin/bash
-
 ## Download Config Files
-RUN if [ "$SRC_PLATFORM" = "JFRT" ] ; then echo "Downloading the fluentd config file for $SRC_PLATFORM and $TGT_PLATFORM "; curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o /opt/bitnami/fluentd/conf/fluentd.conf; else echo "Not Downloading"; fi
-RUN if [ "$SRC_PLATFORM" = "JFXRAY" ] ; then echo "Downloading the fluentd config file for $SRC_PLATFORM and $TGT_PLATFORM "; curl https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray -o /opt/bitnami/fluentd/conf/fluentd.conf; else echo "Not Downloading"; fi
+## The released image releases-docker.jfrog.io/fluentd:4.21 already ships fluentd 1.19.2, curl, and every
+## plugin this integration needs (fluent-plugin-splunk-hec, -jfrog-siem, -jfrog-metrics, -jfrog-send-metrics,
+## -concat, ...), so no fluent-gem install or apt-get step is required here.
+RUN if [ "$SRC_PLATFORM" = "JFRT" ] ; then curl -fsSL https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.rt -o /fluentd/etc/fluent.conf; fi
+RUN if [ "$SRC_PLATFORM" = "JFXRAY" ] ; then curl -fsSL https://raw.githubusercontent.com/jfrog/log-analytics-splunk/master/fluent.conf.xray -o /fluentd/etc/fluent.conf; fi
 
-ENTRYPOINT if [ "$TGT_PLATFORM" = "SPLUNK" ] ; then cat /opt/bitnami/fluentd/conf/fluentd.conf; fluentd -v -c /opt/bitnami/fluentd/conf/fluentd.conf; fi
-
-USER 1001
+USER fluent
 
 STOPSIGNAL SIGTERM
